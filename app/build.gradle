@@ -14,11 +14,11 @@ hilt {
 }
 
 android {
-    namespace 'com.ferhatozcelik.jetpackcomposetemplate'
+    namespace 'com.karasu256.vcnative'
     compileSdk appCompileSdkVersion
 
     defaultConfig {
-        applicationId "com.ferhatozcelik.jetpackcomposetemplate"
+        applicationId "com.karasu256.vcnative"
         minSdk appMinSdkVersion
         targetSdk appTargetSdkVersion
         versionCode 1
