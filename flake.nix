@@ -12,16 +12,20 @@
       nixpkgs,
       flake-utils,
     }:
-
     flake-utils.lib.eachDefaultSystem (
       system:
       let
-        packages = nixpkgs.legacyPackages.${system};
+        packages = import nixpkgs {
+          inherit system;
+          config = {
+            allowUnfree = true;
+            allowBroken = true;
+          };
+        };
       in
       {
-        devShells = {
-          default = import ./.nix/shell.nix { inherit packages; };
-          android = import ./nix/android.nix { inherit packages; };
+        devShells.default = import ./.nix/shell.nix {
+          inherit packages;
         };
       }
     );
