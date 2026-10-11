@@ -4,4 +4,6 @@ interface IRepository<T : Any> {
     suspend fun read(): T?
 
     suspend fun write(value: T?)
+
+    suspend fun restore(): T?
 }

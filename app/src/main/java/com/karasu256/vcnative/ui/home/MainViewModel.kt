@@ -30,9 +30,20 @@ class MainViewModel @Inject constructor(
     private val _events = Channel<MainEvent>(Channel.BUFFERED)
     val events = _events.receiveAsFlow()
 
-    fun login(apiKey: String) {
+    init {
+        viewModelScope.launch {
+            val apiKey = apiKeyRepository.read() ?: return@launch
+            _uiState.update { it.copy(apiKey = apiKey) }
+        }
+    }
+
+    fun onApiKeyChange(apiKey: String) {
+        _uiState.update { it.copy(apiKey = apiKey) }
+    }
+
+    fun login() {
         if (_uiState.value.isLoading) return
-        val key = apiKey.trim()
+        val key = _uiState.value.apiKey.trim()
         viewModelScope.launch {
             _uiState.update { it.copy(isLoading = true, errorRes = null) }
             try {

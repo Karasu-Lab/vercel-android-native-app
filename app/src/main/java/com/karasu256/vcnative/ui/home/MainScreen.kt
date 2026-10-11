@@ -22,10 +22,7 @@ import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.runtime.saveable.rememberSaveable
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.ColorFilter
@@ -54,13 +51,12 @@ import com.ramcosta.composedestinations.generated.destinations.MainScreenDestina
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
 import kotlinx.coroutines.launch
 
-@Destination<RootGraph>(start = true)
+@Destination<RootGraph>
 @Composable
 fun MainScreen(
     navigator: DestinationsNavigator,
     viewModel: MainViewModel = hiltViewModel(),
 ) {
-    var apiKey by rememberSaveable { mutableStateOf("") }
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val spacing = NeuTheme.spacing
     val clipboard = LocalClipboard.current
@@ -104,8 +100,8 @@ fun MainScreen(
             )
             Spacer(Modifier.height(spacing.xl))
             NeuTextField(
-                value = apiKey,
-                onValueChange = { apiKey = it },
+                value = uiState.apiKey,
+                onValueChange = viewModel::onApiKeyChange,
                 modifier = Modifier.fillMaxWidth(),
                 label = stringResource(R.string.api_key_label),
                 placeholder = stringResource(R.string.api_key_placeholder),
@@ -127,7 +123,7 @@ fun MainScreen(
                                     ?.toString()
                                     ?.trim()
                                     ?.takeIf { it.isNotEmpty() }
-                                    ?.let { apiKey = it }
+                                    ?.let(viewModel::onApiKeyChange)
                             }
                         },
                         modifier = Modifier.size(48.dp),
@@ -153,9 +149,9 @@ fun MainScreen(
             }
             Spacer(Modifier.height(spacing.xl))
             NeuButton(
-                onClick = { viewModel.login(apiKey) },
+                onClick = viewModel::login,
                 modifier = Modifier.fillMaxWidth(),
-                enabled = apiKey.isNotBlank(),
+                enabled = uiState.apiKey.isNotBlank(),
                 loading = uiState.isLoading,
             ) {
                 NeuText(text = stringResource(R.string.save_and_verify))

@@ -26,7 +26,7 @@ class HomeViewModel @Inject constructor(
 
     init {
         viewModelScope.launch {
-            val user = runCatching { userRepository.read() }.getOrNull()
+            val user = runCatching { userRepository.restore() }.getOrNull()
             if (user == null) logout() else _uiState.value = HomeUiState.Ready(user.username)
         }
     }
