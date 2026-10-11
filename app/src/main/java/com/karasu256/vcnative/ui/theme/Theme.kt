@@ -38,6 +38,9 @@ object NeuTheme {
 
     val bar: NeuBarStyle
         @Composable @ReadOnlyComposable get() = LocalNeuBarStyle.current
+
+    val statusColors: NeuStatusColors
+        @Composable @ReadOnlyComposable get() = LocalNeuStatusColors.current
 }
 
 @Composable
@@ -55,6 +58,7 @@ fun NeuTheme(
         }
     }
     val colors = remember(scheme, darkTheme) { neuColorsOf(scheme, darkTheme) }
+    val statusColors = remember(darkTheme) { neuStatusColorsOf(darkTheme) }
     val shapes = remember { NeuShapes() }
     val materialColorScheme = remember(scheme, colors) {
         scheme.copy(
@@ -97,6 +101,7 @@ fun NeuTheme(
             LocalNeuElevation provides NeuElevation(),
             LocalNeuMotion provides NeuMotion(),
             LocalNeuBarStyle provides NeuBarStyle(),
+            LocalNeuStatusColors provides statusColors,
             LocalNeuContentColor provides colors.onSurface,
             LocalNeuTextStyle provides DefaultNeuTypography.bodyMedium,
             LocalTextSelectionColors provides selectionColors,
