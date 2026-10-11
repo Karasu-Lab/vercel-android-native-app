@@ -1,6 +1,8 @@
 package com.karasu256.vcnative.ui.deployments.create
 
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -62,11 +64,13 @@ fun CreateDeploymentSheet(
         ) {
             NeuButton(
                 onClick = onProjectClick,
+                modifier = Modifier.fillMaxWidth(),
                 variant = NeuButtonVariant.Neutral,
             ) {
                 state.selectedProject?.let { ProjectIcon(project = it, size = 24.dp) }
                 NeuText(
-                    text = state.selectedProject?.project?.name ?: stringResource(R.string.select_project),
+                    text = state.selectedProject?.project?.name
+                        ?: stringResource(R.string.select_project),
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis,
                 )
@@ -91,8 +95,7 @@ fun CreateDeploymentSheet(
                     ) {
                         repeat(3) {
                             NeuSkeleton(
-                                modifier = Modifier
-                                    .size(width = 80.dp, height = 32.dp),
+                                modifier = Modifier.size(width = 80.dp, height = 32.dp),
                                 shape = NeuTheme.shapes.md,
                             )
                         }
@@ -116,7 +119,9 @@ fun CreateDeploymentSheet(
                                     text = branch.name,
                                     modifier = Modifier
                                         .clip(chip.shape)
-                                        .toggleable(value = selected, role = Role.Checkbox) { onBranchToggle(branch) }
+                                        .toggleable(
+                                            value = selected, role = Role.Checkbox
+                                        ) { onBranchToggle(branch) }
                                         .padding(chip.contentPadding),
                                     style = NeuTheme.typography.bodySmall,
                                     maxLines = 1,
@@ -156,46 +161,79 @@ private fun BranchCommitInfo(
     val colors = NeuTheme.colors
     val typography = NeuTheme.typography
     val spacing = NeuTheme.spacing
-    val height = with(LocalDensity.current) {
-        typography.bodyMedium.lineHeight.toDp() * 2 + typography.bodySmall.lineHeight.toDp() + spacing.xs
-    }
-    Column(
-        modifier = Modifier
-            .fillMaxWidth()
-            .height(height),
-        verticalArrangement = Arrangement.spacedBy(spacing.xs),
-    ) {
-        when {
-            branch == null -> NeuText(
-                text = stringResource(R.string.select_branch),
-                color = colors.onSurfaceMuted,
-            )
-            isLoading -> repeat(2) {
-                NeuSkeleton(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height(18.dp)
-                )
-            }
-            else -> {
-                NeuText(
-                    text = commit?.message ?: branch.name,
-                    maxLines = 2,
-                    overflow = TextOverflow.Ellipsis,
-                )
-                val details = listOfNotNull(
-                    (commit?.sha ?: branch.sha)?.take(7),
-                    commit?.author,
-                    commit?.committedAt?.let {
-                        DateFormat.getDateTimeInstance(DateFormat.MEDIUM, DateFormat.SHORT).format(Date(it))
-                    },
-                )
-                if (details.isNotEmpty()) {
+    val density = LocalDensity.current
+    val messageLineHeight = with(density) { typography.bodyMedium.lineHeight.toDp() }
+    val messageTextHeight = with(density) { typography.bodyMedium.fontSize.toDp() }
+    val detailsLineHeight = with(density) { typography.bodySmall.lineHeight.toDp() }
+    val detailsTextHeight = with(density) { typography.bodySmall.fontSize.toDp() }
+
+    NeuSurface(modifier = Modifier.fillMaxWidth()) {
+        Column(
+            modifier = Modifier
+                .padding(spacing.md)
+                .height(messageLineHeight * 2 + spacing.xs + detailsLineHeight),
+            verticalArrangement = Arrangement.spacedBy(spacing.xs),
+        ) {
+            when {
+                branch == null -> Box(
+                    modifier = Modifier.fillMaxSize(),
+                    contentAlignment = Alignment.Center,
+                ) {
                     NeuText(
-                        text = details.joinToString(" · "),
-                        style = NeuTheme.typography.bodySmall,
+                        text = stringResource(R.string.select_branch),
                         color = colors.onSurfaceMuted,
                     )
+                }
+
+                isLoading -> {
+                    Column(modifier = Modifier.height(messageLineHeight * 2)) {
+                        listOf(1f, 0.6f).forEach { fraction ->
+                            Box(
+                                modifier = Modifier.height(messageLineHeight),
+                                contentAlignment = Alignment.CenterStart,
+                            ) {
+                                NeuSkeleton(
+                                    modifier = Modifier
+                                        .fillMaxWidth(fraction)
+                                        .height(messageTextHeight)
+                                )
+                            }
+                        }
+                    }
+                    Box(
+                        modifier = Modifier.height(detailsLineHeight),
+                        contentAlignment = Alignment.CenterStart,
+                    ) {
+                        NeuSkeleton(
+                            modifier = Modifier
+                                .fillMaxWidth(0.4f)
+                                .height(detailsTextHeight)
+                        )
+                    }
+                }
+
+                else -> {
+                    NeuText(
+                        text = commit?.message ?: branch.name,
+                        modifier = Modifier.height(messageLineHeight * 2),
+                        maxLines = 2,
+                        overflow = TextOverflow.Ellipsis,
+                    )
+                    val details = listOfNotNull(
+                        (commit?.sha ?: branch.sha)?.take(7),
+                        commit?.author,
+                        commit?.committedAt?.let {
+                            DateFormat.getDateTimeInstance(DateFormat.MEDIUM, DateFormat.SHORT)
+                                .format(Date(it))
+                        },
+                    )
+                    if (details.isNotEmpty()) {
+                        NeuText(
+                            text = details.joinToString(" · "),
+                            style = NeuTheme.typography.bodySmall,
+                            color = colors.onSurfaceMuted,
+                        )
+                    }
                 }
             }
         }
