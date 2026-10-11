@@ -29,6 +29,9 @@ object NeuTheme {
 
     val elevation: NeuElevation
         @Composable @ReadOnlyComposable get() = LocalNeuElevation.current
+
+    val motion: NeuMotion
+        @Composable @ReadOnlyComposable get() = LocalNeuMotion.current
 }
 
 @Composable
@@ -59,6 +62,7 @@ fun NeuTheme(
         LocalNeuShapes provides NeuShapes(),
         LocalNeuSpacing provides NeuSpacing(),
         LocalNeuElevation provides NeuElevation(),
+        LocalNeuMotion provides NeuMotion(),
         LocalNeuContentColor provides colors.onSurface,
         LocalNeuTextStyle provides DefaultNeuTypography.bodyMedium,
         LocalTextSelectionColors provides selectionColors,

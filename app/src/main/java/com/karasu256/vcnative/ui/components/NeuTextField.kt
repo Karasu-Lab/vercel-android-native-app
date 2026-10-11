@@ -6,6 +6,7 @@ import androidx.compose.foundation.interaction.collectIsFocusedAsState
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.defaultMinSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -20,6 +21,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.semantics.error
 import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
 import com.karasu256.vcnative.ui.theme.NeuTheme
 
@@ -36,7 +38,9 @@ fun NeuTextField(
     singleLine: Boolean = true,
     keyboardOptions: KeyboardOptions = KeyboardOptions.Default,
     keyboardActions: KeyboardActions = KeyboardActions.Default,
+    visualTransformation: VisualTransformation = VisualTransformation.None,
     interactionSource: MutableInteractionSource? = null,
+    trailing: (@Composable () -> Unit)? = null,
 ) {
     val colors = NeuTheme.colors
     val typography = NeuTheme.typography
@@ -66,6 +70,7 @@ fun NeuTextField(
         singleLine = singleLine,
         keyboardOptions = keyboardOptions,
         keyboardActions = keyboardActions,
+        visualTransformation = visualTransformation,
         interactionSource = source,
         decorationBox = { innerTextField ->
             Column(verticalArrangement = Arrangement.spacedBy(spacing.xs)) {
@@ -76,30 +81,37 @@ fun NeuTextField(
                         color = colors.onSurfaceMuted,
                     )
                 }
-                Box(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .defaultMinSize(minHeight = 48.dp)
-                        .neuSurface(
-                            NeuSurfaceStyle.Inset,
-                            shape,
-                            colors.field,
-                            NeuTheme.elevation.low,
-                            colors
-                        )
-                        .border(borderWidth, borderColor, shape)
-                        .padding(horizontal = spacing.lg, vertical = spacing.md),
-                    contentAlignment = Alignment.CenterStart,
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.spacedBy(spacing.md),
+                    verticalAlignment = Alignment.CenterVertically,
                 ) {
-                    if (value.isEmpty() && placeholder != null) {
-                        NeuText(
-                            text = placeholder,
-                            style = typography.bodyMedium,
-                            color = colors.onSurfaceMuted,
-                            maxLines = 1,
-                        )
+                    Box(
+                        modifier = Modifier
+                            .weight(1f)
+                            .defaultMinSize(minHeight = 48.dp)
+                            .neuSurface(
+                                NeuSurfaceStyle.Inset,
+                                shape,
+                                colors.field,
+                                NeuTheme.elevation.low,
+                                colors
+                            )
+                            .border(borderWidth, borderColor, shape)
+                            .padding(horizontal = spacing.lg, vertical = spacing.md),
+                        contentAlignment = Alignment.CenterStart,
+                    ) {
+                        if (value.isEmpty() && placeholder != null) {
+                            NeuText(
+                                text = placeholder,
+                                style = typography.bodyMedium,
+                                color = colors.onSurfaceMuted,
+                                maxLines = 1,
+                            )
+                        }
+                        innerTextField()
                     }
-                    innerTextField()
+                    trailing?.invoke()
                 }
                 val helper = errorText ?: supportingText
                 if (helper != null) {

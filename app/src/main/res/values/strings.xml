@@ -4,4 +4,8 @@
     <string name="api_key_label">API key</string>
     <string name="api_key_placeholder">Enter your API key</string>
     <string name="save_and_verify">Save and verify</string>
+    <string name="error_invalid_api_key">The API key is invalid.</string>
+    <string name="error_login_failed">Failed to connect to Vercel.</string>
+    <string name="logout">Log out</string>
+    <string name="paste">Paste</string>
 </resources>
