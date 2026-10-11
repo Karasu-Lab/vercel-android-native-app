@@ -1,5 +1,6 @@
 package com.karasu256.vcnative.ui.components
 
+import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -7,10 +8,14 @@ import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.interaction.collectIsFocusedAsState
 import androidx.compose.foundation.interaction.collectIsPressedAsState
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.defaultMinSize
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.getValue
@@ -36,23 +41,30 @@ fun NeuButton(
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
     enabled: Boolean = true,
+    loading: Boolean = false,
     variant: NeuButtonVariant = NeuButtonVariant.Primary,
     interactionSource: MutableInteractionSource? = null,
+    contentPadding: PaddingValues = PaddingValues(
+        horizontal = NeuTheme.spacing.xl,
+        vertical = NeuTheme.spacing.md,
+    ),
     content: @Composable RowScope.() -> Unit
 ) {
     val colors = NeuTheme.colors
     val shape = NeuTheme.shapes.md
     val spacing = NeuTheme.spacing
     val depth = NeuTheme.elevation.medium
+    val motion = NeuTheme.motion
     val source = interactionSource ?: remember { MutableInteractionSource() }
     val pressed by source.collectIsPressedAsState()
     val focused by source.collectIsFocusedAsState()
+    val active = enabled && !loading
 
-    val raise by animateFloatAsState(if (enabled && !pressed) 1f else 0f, label = "raise")
-    val sink by animateFloatAsState(if (enabled && pressed) 1f else 0f, label = "sink")
+    val raise by animateFloatAsState(if (active && !pressed) 1f else 0f, label = "raise")
+    val sink by animateFloatAsState(if (active && pressed) 1f else 0f, label = "sink")
 
     val contentColor = when {
-        !enabled -> colors.disabled
+        !active -> colors.disabled
         variant == NeuButtonVariant.Primary -> colors.primary
         else -> colors.onSurface
     }
@@ -63,7 +75,7 @@ fun NeuButton(
         if (sink > raise) listOf(lowlight, colors.surface, highlight) else listOf(highlight, colors.surface, lowlight)
     )
 
-    Row(
+    Box(
         modifier = modifier
             .defaultMinSize(minWidth = 48.dp, minHeight = 48.dp)
             .neuFocusRing(focused, shape, colors.primary)
@@ -85,19 +97,37 @@ fun NeuButton(
             .clickable(
                 interactionSource = source,
                 indication = null,
-                enabled = enabled,
+                enabled = active,
                 role = Role.Button,
                 onClick = onClick
             )
-            .padding(horizontal = spacing.xl, vertical = spacing.md),
-        horizontalArrangement = Arrangement.spacedBy(spacing.sm, Alignment.CenterHorizontally),
-        verticalAlignment = Alignment.CenterVertically,
+            .padding(contentPadding),
+        contentAlignment = Alignment.Center,
     ) {
         CompositionLocalProvider(
             LocalNeuContentColor provides contentColor,
             LocalNeuTextStyle provides NeuTheme.typography.button,
         ) {
-            content()
+            AnimatedContent(
+                targetState = loading,
+                transitionSpec = { motion.contentChange },
+                contentAlignment = Alignment.Center,
+            ) { isLoading ->
+                if (isLoading) {
+                    CircularProgressIndicator(
+                        modifier = Modifier.size(20.dp),
+                        color = colors.primary,
+                        trackColor = Color.Transparent,
+                        strokeWidth = 2.dp,
+                    )
+                } else {
+                    Row(
+                        horizontalArrangement = Arrangement.spacedBy(spacing.sm, Alignment.CenterHorizontally),
+                        verticalAlignment = Alignment.CenterVertically,
+                        content = content,
+                    )
+                }
+            }
         }
     }
 }
