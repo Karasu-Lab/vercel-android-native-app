@@ -8,6 +8,7 @@
 packages.mkShell {
   buildInputs = with packages; [
     git
+    gh
     android-tools
     kotlin-language-server
     jdk21
