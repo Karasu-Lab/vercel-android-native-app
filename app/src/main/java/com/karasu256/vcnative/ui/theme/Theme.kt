@@ -1,70 +1,67 @@
 package com.karasu256.vcnative.ui.theme
 
-import android.app.Activity
 import android.os.Build
 import androidx.compose.foundation.isSystemInDarkTheme
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.darkColorScheme
 import androidx.compose.material3.dynamicDarkColorScheme
 import androidx.compose.material3.dynamicLightColorScheme
 import androidx.compose.material3.lightColorScheme
+import androidx.compose.foundation.text.selection.LocalTextSelectionColors
+import androidx.compose.foundation.text.selection.TextSelectionColors
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.SideEffect
-import androidx.compose.ui.graphics.toArgb
+import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.ReadOnlyComposable
+import androidx.compose.runtime.remember
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.platform.LocalView
-import androidx.core.view.WindowCompat
 
-private val DarkColorScheme = darkColorScheme(
-    primary = Purple80,
-    secondary = PurpleGrey80,
-    tertiary = Pink80
-)
+object NeuTheme {
+    val colors: NeuColors
+        @Composable @ReadOnlyComposable get() = LocalNeuColors.current
 
-private val LightColorScheme = lightColorScheme(
-    primary = Purple40,
-    secondary = PurpleGrey40,
-    tertiary = Pink40
+    val typography: NeuTypography
+        @Composable @ReadOnlyComposable get() = LocalNeuTypography.current
 
-    /* Other default colors to override
-    background = Color(0xFFFFFBFE),
-    surface = Color(0xFFFFFBFE),
-    onPrimary = Color.White,
-    onSecondary = Color.White,
-    onTertiary = Color.White,
-    onBackground = Color(0xFF1C1B1F),
-    onSurface = Color(0xFF1C1B1F),
-    */
-)
+    val shapes: NeuShapes
+        @Composable @ReadOnlyComposable get() = LocalNeuShapes.current
+
+    val spacing: NeuSpacing
+        @Composable @ReadOnlyComposable get() = LocalNeuSpacing.current
+
+    val elevation: NeuElevation
+        @Composable @ReadOnlyComposable get() = LocalNeuElevation.current
+}
 
 @Composable
-fun MyApplicationTheme(
+fun NeuTheme(
     darkTheme: Boolean = isSystemInDarkTheme(),
-    // Dynamic color is available on Android 12+
-    dynamicColor: Boolean = true,
     content: @Composable () -> Unit
 ) {
-    val colorScheme = when {
-        dynamicColor && Build.VERSION.SDK_INT >= Build.VERSION_CODES.S -> {
-            val context = LocalContext.current
-            if (darkTheme) dynamicDarkColorScheme(context) else dynamicLightColorScheme(context)
+    val context = LocalContext.current
+    val colors = remember(context, darkTheme) {
+        val scheme = when {
+            Build.VERSION.SDK_INT >= Build.VERSION_CODES.S && darkTheme -> dynamicDarkColorScheme(context)
+            Build.VERSION.SDK_INT >= Build.VERSION_CODES.S -> dynamicLightColorScheme(context)
+            darkTheme -> darkColorScheme()
+            else -> lightColorScheme()
         }
-
-        darkTheme -> DarkColorScheme
-        else -> LightColorScheme
+        neuColorsOf(scheme, darkTheme)
     }
-    val view = LocalView.current
-    if (!view.isInEditMode) {
-        SideEffect {
-            val window = (view.context as Activity).window
-            window.statusBarColor = colorScheme.primary.toArgb()
-            WindowCompat.getInsetsController(window, view).isAppearanceLightStatusBars = darkTheme
-        }
+    val selectionColors = remember(colors) {
+        TextSelectionColors(
+            handleColor = colors.primary,
+            backgroundColor = colors.primary.copy(alpha = 0.3f),
+        )
     }
 
-    MaterialTheme(
-        colorScheme = colorScheme,
-        typography = Typography,
+    CompositionLocalProvider(
+        LocalNeuColors provides colors,
+        LocalNeuTypography provides DefaultNeuTypography,
+        LocalNeuShapes provides NeuShapes(),
+        LocalNeuSpacing provides NeuSpacing(),
+        LocalNeuElevation provides NeuElevation(),
+        LocalNeuContentColor provides colors.onSurface,
+        LocalNeuTextStyle provides DefaultNeuTypography.bodyMedium,
+        LocalTextSelectionColors provides selectionColors,
         content = content
     )
 }

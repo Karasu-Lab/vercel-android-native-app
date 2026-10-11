@@ -1,0 +1,17 @@
+{
+  "version": 1,
+  "skills": {
+    "neumorphism": {
+      "source": "bergside/awesome-design-skills",
+      "sourceType": "github",
+      "skillPath": "skills/neumorphism/SKILL.md",
+      "computedHash": "f233e9f16e96a2675256c73877f90b201650be9b79bcbbe50bd07737bce3d955"
+    },
+    "typeui-fundamentals": {
+      "source": "bergside/typeui",
+      "sourceType": "github",
+      "skillPath": "skills/fundamentals/SKILL.md",
+      "computedHash": "86d37fb3dac5cf197bed8d2efd0e2e3e67c372a62347f2639a9e8d88ba05e793"
+    }
+  }
+}

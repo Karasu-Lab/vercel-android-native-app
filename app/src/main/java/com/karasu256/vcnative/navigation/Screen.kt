@@ -8,10 +8,6 @@ import kotlinx.serialization.Serializable
  * so arguments are compile-time checked and refactor-safe.
  */
 sealed interface Screen {
-
     @Serializable
     data object Main : Screen
-
-    @Serializable
-    data class Detail(val id: Int) : Screen
 }
