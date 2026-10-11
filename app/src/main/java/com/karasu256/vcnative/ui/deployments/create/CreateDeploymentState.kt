@@ -13,7 +13,6 @@ data class ProjectItem(
 )
 
 data class CreateDeploymentUiState(
-    val isSheetOpen: Boolean = false,
     val isProjectDialogOpen: Boolean = false,
     val isGitHubSheetOpen: Boolean = false,
     val projects: List<ProjectItem>? = null,

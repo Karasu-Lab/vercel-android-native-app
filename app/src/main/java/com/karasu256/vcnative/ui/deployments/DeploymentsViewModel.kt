@@ -47,6 +47,7 @@ class DeploymentsViewModel @Inject constructor(
             launch {
                 projectFilterRepository.selected.collect { project ->
                     projectId = project?.id
+                    _uiState.update { it.copy(filterProject = project) }
                     reload()
                 }
             }
