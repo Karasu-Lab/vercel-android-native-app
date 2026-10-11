@@ -3,6 +3,7 @@ package com.karasu256.vcnative.ui.shell
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.LocalActivity
 import androidx.annotation.StringRes
+import androidx.compose.animation.core.animate
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -14,6 +15,7 @@ import androidx.compose.foundation.layout.WindowInsetsSides
 import androidx.compose.foundation.layout.displayCutout
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.only
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -28,10 +30,23 @@ import androidx.compose.material3.rememberDrawerState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableFloatStateOf
+import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.ColorFilter
+import androidx.compose.ui.input.nestedscroll.NestedScrollConnection
+import androidx.compose.ui.input.nestedscroll.NestedScrollSource
+import androidx.compose.ui.input.nestedscroll.nestedScroll
+import androidx.compose.ui.layout.onSizeChanged
+import androidx.compose.ui.unit.IntOffset
+import androidx.compose.ui.unit.Velocity
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
@@ -57,7 +72,9 @@ import com.ramcosta.composedestinations.navigation.DestinationsNavigator
 import com.ramcosta.composedestinations.spec.DirectionDestinationSpec
 import com.ramcosta.composedestinations.utils.currentDestinationAsState
 import com.ramcosta.composedestinations.utils.rememberDestinationsNavigator
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
+import kotlin.math.roundToInt
 
 enum class ShellTab(
     val destination: DirectionDestinationSpec,
@@ -85,6 +102,33 @@ fun ShellScreen(
     val scope = rememberCoroutineScope()
     val spacing = NeuTheme.spacing
     val insets = WindowInsets.systemBars.union(WindowInsets.displayCutout)
+    val motion = NeuTheme.motion
+    var barsCollapse by rememberSaveable { mutableFloatStateOf(0f) }
+    var bottomBarHeight by remember { mutableIntStateOf(0) }
+    var settleJob by remember { mutableStateOf<Job?>(null) }
+    val barsScrollConnection = remember(motion) {
+        object : NestedScrollConnection {
+            override fun onPreScroll(available: Offset, source: NestedScrollSource): Offset {
+                if (available.y != 0f && bottomBarHeight > 0) {
+                    settleJob?.cancel()
+                    barsCollapse = (barsCollapse - available.y / bottomBarHeight).coerceIn(0f, 1f)
+                }
+                return Offset.Zero
+            }
+
+            override suspend fun onPostFling(consumed: Velocity, available: Velocity): Velocity {
+                settleJob?.cancel()
+                settleJob = scope.launch {
+                    animate(
+                        initialValue = barsCollapse,
+                        targetValue = if (barsCollapse >= 0.5f) 1f else 0f,
+                        animationSpec = motion.barsSettle,
+                    ) { value, _ -> barsCollapse = value }
+                }
+                return Velocity.Zero
+            }
+        }
+    }
 
     LaunchedEffect(viewModel) {
         viewModel.events.collect { event ->
@@ -117,11 +161,16 @@ fun ShellScreen(
         onUserClick = { viewModel.showSheet(ShellSheet.User) },
         onThemeClick = { viewModel.showSheet(ShellSheet.Theme) },
     ) {
-        Box(modifier = Modifier.fillMaxSize()) {
+        Box(
+            modifier = Modifier
+                .fillMaxSize()
+                .nestedScroll(barsScrollConnection),
+        ) {
             Column(modifier = Modifier.fillMaxSize()) {
                 ShellHeader(
                     title = stringResource(currentTab.labelRes),
                     onMenuClick = { scope.launch { drawerState.open() } },
+                    collapseFraction = barsCollapse,
                 )
                 DestinationsNavHost(
                     navGraph = NavGraphs.shell,
@@ -134,7 +183,9 @@ fun ShellScreen(
             NeuSurface(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .align(Alignment.BottomCenter),
+                    .align(Alignment.BottomCenter)
+                    .onSizeChanged { bottomBarHeight = it.height }
+                    .offset { IntOffset(0, (bottomBarHeight * barsCollapse).roundToInt()) },
                 shape = NeuTheme.bar.shape,
                 depth = NeuTheme.bar.depth,
             ) {

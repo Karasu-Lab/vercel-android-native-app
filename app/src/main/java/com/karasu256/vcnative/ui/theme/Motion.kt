@@ -1,6 +1,7 @@
 package com.karasu256.vcnative.ui.theme
 
 import androidx.compose.animation.ContentTransform
+import androidx.compose.animation.core.AnimationSpec
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
@@ -15,6 +16,7 @@ data class NeuMotion(
     val contentChange: ContentTransform =
         (fadeIn(tween(220, delayMillis = 90)) + scaleIn(tween(220, delayMillis = 90), initialScale = 0.8f))
             .togetherWith(fadeOut(tween(90)) + scaleOut(tween(90), targetScale = 0.8f)),
+    val barsSettle: AnimationSpec<Float> = tween(220),
 )
 
 internal val LocalNeuMotion = staticCompositionLocalOf { NeuMotion() }
