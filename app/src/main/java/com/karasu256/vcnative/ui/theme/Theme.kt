@@ -64,6 +64,8 @@ fun NeuTheme(
         scheme.copy(
             primary = colors.primary,
             onPrimary = colors.onPrimary,
+            background = colors.surface,
+            onBackground = colors.onSurface,
             surface = colors.surface,
             surfaceContainerLow = colors.surface,
             onSurface = colors.onSurface,

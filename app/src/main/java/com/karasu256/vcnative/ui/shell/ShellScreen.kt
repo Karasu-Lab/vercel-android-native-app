@@ -70,6 +70,7 @@ import com.ramcosta.composedestinations.generated.destinations.MainScreenDestina
 import com.ramcosta.composedestinations.generated.destinations.SettingsScreenDestination
 import com.ramcosta.composedestinations.generated.destinations.ShellScreenDestination
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
+import com.ramcosta.composedestinations.navigation.dependency
 import com.ramcosta.composedestinations.spec.DirectionDestinationSpec
 import com.ramcosta.composedestinations.utils.currentDestinationAsState
 import com.ramcosta.composedestinations.utils.rememberDestinationsNavigator
@@ -177,6 +178,7 @@ fun ShellScreen(
                 DestinationsNavHost(
                     navGraph = NavGraphs.shell,
                     navController = navController,
+                    dependenciesContainerBuilder = { dependency(RootNavigator(navigator)) },
                     modifier = Modifier
                         .weight(1f)
                         .windowInsetsPadding(insets.only(WindowInsetsSides.Horizontal)),
