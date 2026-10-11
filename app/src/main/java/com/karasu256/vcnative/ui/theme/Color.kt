@@ -1,65 +1,56 @@
 package com.karasu256.vcnative.ui.theme
 
+import androidx.compose.material3.ColorScheme
+import androidx.compose.material3.lightColorScheme
 import androidx.compose.runtime.Immutable
 import androidx.compose.runtime.compositionLocalOf
 import androidx.compose.runtime.staticCompositionLocalOf
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.compositeOver
+import androidx.compose.ui.graphics.lerp
 
 @Immutable
 data class NeuColors(
     val primary: Color,
     val onPrimary: Color,
-    val secondary: Color,
     val surface: Color,
     val onSurface: Color,
     val onSurfaceMuted: Color,
     val field: Color,
     val outline: Color,
     val disabled: Color,
-    val success: Color,
-    val warning: Color,
     val danger: Color,
     val shadowLight: Color,
     val shadowDark: Color,
     val isDark: Boolean,
 )
 
-internal val NeuLightColors = NeuColors(
-    primary = Color(0xFF006666),
-    onPrimary = Color(0xFFF1F2F5),
-    secondary = Color(0xFFF1F2F5),
-    surface = Color(0xFFE7E5E4),
-    onSurface = Color(0xFF1E2938),
-    onSurfaceMuted = Color(0xFF4A5565),
-    field = Color(0xFFF1F2F5),
-    outline = Color(0xFF857F7C),
-    disabled = Color(0xFF7D7774),
-    success = Color(0xFF00752B),
-    warning = Color(0xFF8A5200),
-    danger = Color(0xFFC8003A),
-    shadowLight = Color(0xD9FFFFFF),
-    shadowDark = Color(0x99A8A29E),
-    isDark = false,
-)
+fun neuColorsOf(scheme: ColorScheme, isDark: Boolean): NeuColors {
+    val surface = scheme.surfaceContainer
+    return NeuColors(
+        primary = scheme.primary,
+        onPrimary = scheme.onPrimary,
+        surface = surface,
+        onSurface = scheme.onSurface,
+        onSurfaceMuted = scheme.onSurfaceVariant,
+        field = scheme.surfaceContainerLow,
+        outline = scheme.outline,
+        disabled = scheme.onSurface.copy(alpha = 0.38f).compositeOver(surface),
+        danger = scheme.error,
+        shadowLight = if (isDark) {
+            lerp(surface, Color.White, 0.08f)
+        } else {
+            lerp(surface, Color.White, 0.75f)
+        },
+        shadowDark = if (isDark) {
+            lerp(surface, Color.Black, 0.55f)
+        } else {
+            lerp(surface, Color.Black, 0.2f).copy(alpha = 0.7f)
+        },
+        isDark = isDark,
+    )
+}
 
-internal val NeuDarkColors = NeuColors(
-    primary = Color(0xFF4FC2C2),
-    onPrimary = Color(0xFF1E2938),
-    secondary = Color(0xFF1F1E1D),
-    surface = Color(0xFF2A2827),
-    onSurface = Color(0xFFE7E5E4),
-    onSurfaceMuted = Color(0xFFB5B0AD),
-    field = Color(0xFF1F1E1D),
-    outline = Color(0xFF7F7976),
-    disabled = Color(0xFF7F7976),
-    success = Color(0xFF3DD47A),
-    warning = Color(0xFFFFB547),
-    danger = Color(0xFFFF6B8D),
-    shadowLight = Color(0x4D57524F),
-    shadowDark = Color(0xCC121110),
-    isDark = true,
-)
+internal val LocalNeuColors = staticCompositionLocalOf { neuColorsOf(lightColorScheme(), false) }
 
-internal val LocalNeuColors = staticCompositionLocalOf { NeuLightColors }
-
-val LocalNeuContentColor = compositionLocalOf { NeuLightColors.onSurface }
+val LocalNeuContentColor = compositionLocalOf { lightColorScheme().onSurface }

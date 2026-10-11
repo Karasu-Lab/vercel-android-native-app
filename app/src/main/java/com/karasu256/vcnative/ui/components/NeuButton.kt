@@ -1,6 +1,7 @@
 package com.karasu256.vcnative.ui.components
 
-import androidx.compose.foundation.border
+import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.interaction.collectIsFocusedAsState
@@ -16,11 +17,17 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.lerp
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.unit.dp
 import com.karasu256.vcnative.ui.theme.LocalNeuContentColor
 import com.karasu256.vcnative.ui.theme.LocalNeuTextStyle
+import com.karasu256.vcnative.ui.theme.NeuDepth
 import com.karasu256.vcnative.ui.theme.NeuTheme
+import com.karasu256.vcnative.ui.theme.neuInset
+import com.karasu256.vcnative.ui.theme.neuRaised
 
 enum class NeuButtonVariant { Primary, Neutral }
 
@@ -36,32 +43,45 @@ fun NeuButton(
     val colors = NeuTheme.colors
     val shape = NeuTheme.shapes.md
     val spacing = NeuTheme.spacing
+    val depth = NeuTheme.elevation.medium
     val source = interactionSource ?: remember { MutableInteractionSource() }
     val pressed by source.collectIsPressedAsState()
     val focused by source.collectIsFocusedAsState()
 
-    val containerColor = when {
-        !enabled -> colors.surface
-        variant == NeuButtonVariant.Primary -> colors.primary
-        else -> colors.surface
-    }
+    val raise by animateFloatAsState(if (enabled && !pressed) 1f else 0f, label = "raise")
+    val sink by animateFloatAsState(if (enabled && pressed) 1f else 0f, label = "sink")
+
     val contentColor = when {
         !enabled -> colors.disabled
-        variant == NeuButtonVariant.Primary -> colors.onPrimary
+        variant == NeuButtonVariant.Primary -> colors.primary
         else -> colors.onSurface
     }
-    val surfaceStyle = when {
-        !enabled -> NeuSurfaceStyle.Flat
-        pressed -> NeuSurfaceStyle.Inset
-        else -> NeuSurfaceStyle.Raised
-    }
+    val tone = maxOf(raise, sink)
+    val highlight = lerp(colors.surface, colors.shadowLight.opaque, 0.35f * tone)
+    val lowlight = lerp(colors.surface, colors.shadowDark.opaque, 0.12f * tone)
+    val face = Brush.linearGradient(
+        if (sink > raise) listOf(lowlight, colors.surface, highlight) else listOf(highlight, colors.surface, lowlight)
+    )
 
     Row(
         modifier = modifier
             .defaultMinSize(minWidth = 48.dp, minHeight = 48.dp)
             .neuFocusRing(focused, shape, colors.primary)
-            .neuSurface(surfaceStyle, shape, containerColor, NeuTheme.elevation.low, colors)
-            .then(if (enabled) Modifier else Modifier.border(1.dp, colors.disabled, shape))
+            .then(
+                if (raise > 0f) {
+                    Modifier.neuRaised(shape, depth * raise, colors.shadowLight, colors.shadowDark)
+                } else {
+                    Modifier
+                }
+            )
+            .background(face, shape)
+            .then(
+                if (sink > 0f) {
+                    Modifier.neuInset(shape, depth * sink, colors.shadowLight, colors.shadowDark)
+                } else {
+                    Modifier
+                }
+            )
             .clickable(
                 interactionSource = source,
                 indication = null,
@@ -81,3 +101,10 @@ fun NeuButton(
         }
     }
 }
+
+private operator fun NeuDepth.times(fraction: Float) = NeuDepth(
+    distance = distance * fraction,
+    blur = blur * fraction,
+)
+
+private val Color.opaque get() = copy(alpha = 1f)
