@@ -46,8 +46,8 @@ import com.karasu256.vcnative.ui.theme.LocalNeuContentColor
 import com.karasu256.vcnative.ui.theme.NeuTheme
 import com.ramcosta.composedestinations.annotation.Destination
 import com.ramcosta.composedestinations.annotation.RootGraph
-import com.ramcosta.composedestinations.generated.destinations.HomeScreenDestination
 import com.ramcosta.composedestinations.generated.destinations.MainScreenDestination
+import com.ramcosta.composedestinations.generated.destinations.ShellScreenDestination
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
 import kotlinx.coroutines.launch
 
@@ -66,7 +66,7 @@ fun MainScreen(
     LaunchedEffect(viewModel) {
         viewModel.events.collect { event ->
             when (event) {
-                MainEvent.NavigateHome -> navigator.navigate(HomeScreenDestination) {
+                MainEvent.NavigateShell -> navigator.navigate(ShellScreenDestination) {
                     popUpTo(MainScreenDestination) { inclusive = true }
                 }
             }

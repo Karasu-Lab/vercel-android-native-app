@@ -8,4 +8,6 @@
     <string name="error_login_failed">Failed to connect to Vercel.</string>
     <string name="logout">Log out</string>
     <string name="paste">Paste</string>
+    <string name="deployments">Deployments</string>
+    <string name="settings">Settings</string>
 </resources>

@@ -25,8 +25,8 @@ import com.karasu256.vcnative.R
 import com.karasu256.vcnative.ui.theme.NeuTheme
 import com.ramcosta.composedestinations.annotation.Destination
 import com.ramcosta.composedestinations.annotation.RootGraph
-import com.ramcosta.composedestinations.generated.destinations.HomeScreenDestination
 import com.ramcosta.composedestinations.generated.destinations.MainScreenDestination
+import com.ramcosta.composedestinations.generated.destinations.ShellScreenDestination
 import com.ramcosta.composedestinations.generated.destinations.SplashScreenDestination
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
 
@@ -45,7 +45,7 @@ fun SplashScreen(
         viewModel.events.collect { event ->
             val destination = when (event) {
                 SplashEvent.NavigateMain -> MainScreenDestination
-                SplashEvent.NavigateHome -> HomeScreenDestination
+                SplashEvent.NavigateShell -> ShellScreenDestination
             }
             navigator.navigate(destination) {
                 popUpTo(SplashScreenDestination) { inclusive = true }

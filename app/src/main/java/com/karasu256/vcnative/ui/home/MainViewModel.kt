@@ -50,7 +50,7 @@ class MainViewModel @Inject constructor(
                 apiKeyRepository.write(key)
                 val user = api.getUser(key)
                 userRepository.write(user)
-                _events.send(MainEvent.NavigateHome)
+                _events.send(MainEvent.NavigateShell)
             } catch (e: CancellationException) {
                 throw e
             } catch (e: ClientRequestException) {

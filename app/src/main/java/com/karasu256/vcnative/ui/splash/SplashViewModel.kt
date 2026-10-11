@@ -25,7 +25,7 @@ class SplashViewModel @Inject constructor(
         viewModelScope.launch {
             val event = try {
                 if (apiKeyRepository.restore() != null && userRepository.restore() != null) {
-                    SplashEvent.NavigateHome
+                    SplashEvent.NavigateShell
                 } else {
                     SplashEvent.NavigateMain
                 }
