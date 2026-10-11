@@ -24,4 +24,5 @@
     <string name="deployment_state_ready">ビルド成功</string>
     <string name="deployment_state_canceled">キャンセル</string>
     <string name="deployment_state_unknown">不明</string>
+    <string name="new_deployment">新しいデプロイ</string>
 </resources>

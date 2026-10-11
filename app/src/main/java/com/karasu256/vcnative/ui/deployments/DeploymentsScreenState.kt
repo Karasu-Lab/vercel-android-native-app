@@ -12,6 +12,8 @@ data class DeploymentInfo(
     val id: String,
     val projectName: String,
     val description: String?,
+    val branch: String?,
+    val createdAt: Long,
     val creators: List<DeploymentCreator>,
     val state: DeploymentState,
     val startedAt: Long,
@@ -21,6 +23,7 @@ data class DeploymentInfo(
 
 data class DeploymentsUiState(
     val deployments: List<DeploymentInfo> = emptyList(),
+    val newDeployments: List<DeploymentInfo> = emptyList(),
     val isLoadingMore: Boolean = false,
     val isRefreshing: Boolean = false,
     val hasMore: Boolean = true,

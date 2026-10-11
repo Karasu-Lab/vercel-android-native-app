@@ -52,6 +52,9 @@ data class DeploymentMetaDto(
     val githubCommitMessage: String? = null,
     val gitlabCommitMessage: String? = null,
     val bitbucketCommitMessage: String? = null,
+    val githubCommitRef: String? = null,
+    val gitlabCommitRef: String? = null,
+    val bitbucketCommitRef: String? = null,
 )
 
 @Serializable
