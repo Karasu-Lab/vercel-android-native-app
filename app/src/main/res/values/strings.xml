@@ -44,7 +44,6 @@
     <string name="select_project">Select project</string>
     <string name="select_branch">Select a branch</string>
     <string name="deploy">Deploy</string>
-    <string name="cancel">Cancel</string>
     <string name="link_github">Link GitHub</string>
     <string name="github_linked">GitHub linked</string>
     <string name="unlink_github">Unlink</string>
