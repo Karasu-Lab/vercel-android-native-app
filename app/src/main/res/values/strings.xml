@@ -1,3 +1,7 @@
 <resources>
     <string name="app_name">Vercel Native</string>
+    <string name="api_key_description">To use this app, you need to set your Vercel API key.</string>
+    <string name="api_key_label">API key</string>
+    <string name="api_key_placeholder">Enter your API key</string>
+    <string name="save_and_verify">Save and verify</string>
 </resources>
