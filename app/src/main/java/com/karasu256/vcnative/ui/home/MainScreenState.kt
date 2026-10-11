@@ -9,5 +9,5 @@ data class MainUiState(
 )
 
 sealed interface MainEvent {
-    data object NavigateHome : MainEvent
+    data object NavigateShell : MainEvent
 }
