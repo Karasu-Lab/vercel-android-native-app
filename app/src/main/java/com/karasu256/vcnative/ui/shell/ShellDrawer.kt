@@ -43,11 +43,11 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.graphics.RectangleShape
-import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.input.pointer.positionChange
 import androidx.compose.ui.input.pointer.util.VelocityTracker
 import androidx.compose.ui.input.pointer.util.addPointerInputChange
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
@@ -105,16 +105,21 @@ fun ShellDrawer(
                                 velocityTracker.resetTracking()
                                 velocityTracker.addPointerInputChange(down)
                                 var current = expansion.value
-                                val drag = awaitHorizontalTouchSlopOrCancellation(down.id) { change, overSlop ->
-                                    if (overSlop > 0f || current > 0f) {
-                                        change.consume()
-                                        current = (current + overSlop / range).coerceIn(0f, 1f)
-                                    }
-                                } ?: return@awaitEachGesture
+                                val drag =
+                                    awaitHorizontalTouchSlopOrCancellation(down.id) { change, overSlop ->
+                                        if (overSlop > 0f || current > 0f) {
+                                            change.consume()
+                                            current = (current + overSlop / range).coerceIn(0f, 1f)
+                                        }
+                                    } ?: return@awaitEachGesture
                                 scope.launch { expansion.snapTo(current) }
                                 horizontalDrag(drag.id) { change ->
                                     velocityTracker.addPointerInputChange(change)
-                                    current = (current + change.positionChange().x / range).coerceIn(0f, 1f)
+                                    current =
+                                        (current + change.positionChange().x / range).coerceIn(
+                                            0f,
+                                            1f
+                                        )
                                     change.consume()
                                     scope.launch { expansion.snapTo(current) }
                                 }
@@ -140,7 +145,11 @@ fun ShellDrawer(
                                 modifier = Modifier
                                     .windowInsetsPadding(WindowInsets.statusBars)
                                     .windowInsetsPadding(horizontalInsets)
-                                    .padding(start = spacing.lg, end = spacing.lg, bottom = spacing.sm),
+                                    .padding(
+                                        start = spacing.lg,
+                                        end = spacing.lg,
+                                        bottom = spacing.sm
+                                    ),
                                 horizontalArrangement = Arrangement.spacedBy(spacing.lg),
                                 verticalAlignment = Alignment.CenterVertically,
                             ) {

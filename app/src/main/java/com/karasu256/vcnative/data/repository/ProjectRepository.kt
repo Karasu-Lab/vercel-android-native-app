@@ -1,9 +1,16 @@
 package com.karasu256.vcnative.data.repository
 
-import android.graphics.Bitmap
 import com.karasu256.vcnative.data.model.Project
+import com.karasu256.vcnative.data.model.ProjectWithAvatar
 import com.karasu256.vcnative.data.remote.VercelApi
 import kotlinx.coroutines.CancellationException
+import kotlinx.coroutines.coroutineScope
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.sync.Mutex
+import kotlinx.coroutines.sync.withLock
 import javax.inject.Inject
 import javax.inject.Singleton
 
@@ -12,9 +19,15 @@ class ProjectRepository @Inject constructor(
     private val apiKeyRepository: ApiKeyRepository,
     private val api: VercelApi,
 ) {
-    suspend fun getProjects(): List<Project> {
-        val apiKey = apiKeyRepository.read() ?: return emptyList()
-        return try {
+    private val _projects = MutableStateFlow<List<ProjectWithAvatar>?>(null)
+    val projects = _projects.asStateFlow()
+
+    private val mutex = Mutex()
+
+    suspend fun load() = mutex.withLock {
+        if (_projects.value != null) return@withLock
+        val apiKey = apiKeyRepository.read() ?: return@withLock
+        val projects = try {
             api.getProjects(apiKey).map { project ->
                 Project(
                     id = project.id,
@@ -31,16 +44,24 @@ class ProjectRepository @Inject constructor(
         } catch (e: Exception) {
             emptyList()
         }
-    }
+        _projects.value = projects.map { ProjectWithAvatar(it) }
 
-    suspend fun getAvatar(project: Project, size: Int): Bitmap? {
-        val hash = project.avatarHash ?: return null
-        return try {
-            api.getAvatarBitmapByHash(hash, size)
-        } catch (e: CancellationException) {
-            throw e
-        } catch (e: Exception) {
-            null
+        coroutineScope {
+            projects.forEach { project ->
+                val hash = project.avatarHash ?: return@forEach
+                launch {
+                    val avatar = try {
+                        api.getAvatarBitmapByHash(hash, 64)
+                    } catch (e: CancellationException) {
+                        throw e
+                    } catch (e: Exception) {
+                        null
+                    } ?: return@launch
+                    _projects.update { list ->
+                        list?.map { if (it.project.id == project.id) it.copy(avatar = avatar) else it }
+                    }
+                }
+            }
         }
     }
 }

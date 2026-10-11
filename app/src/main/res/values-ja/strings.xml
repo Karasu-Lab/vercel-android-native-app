@@ -48,4 +48,6 @@
     <string name="github_linked">GitHub と連携済み</string>
     <string name="unlink_github">連携解除</string>
     <string name="error_create_deployment">デプロイを作成できませんでした。</string>
+    <string name="all_projects">すべてのプロジェクト</string>
+    <string name="clear_project_filter">プロジェクトの絞り込みを解除</string>
 </resources>
