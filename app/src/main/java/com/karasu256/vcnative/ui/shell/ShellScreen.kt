@@ -4,6 +4,7 @@ import androidx.annotation.StringRes
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.WindowInsets
@@ -20,8 +21,11 @@ import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.RocketLaunch
 import androidx.compose.material.icons.filled.Settings
+import androidx.compose.material3.DrawerValue
+import androidx.compose.material3.rememberDrawerState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.ColorFilter
@@ -45,6 +49,7 @@ import com.ramcosta.composedestinations.generated.destinations.SettingsScreenDes
 import com.ramcosta.composedestinations.spec.DirectionDestinationSpec
 import com.ramcosta.composedestinations.utils.currentDestinationAsState
 import com.ramcosta.composedestinations.utils.rememberDestinationsNavigator
+import kotlinx.coroutines.launch
 
 enum class ShellTab(
     val destination: DirectionDestinationSpec,
@@ -61,49 +66,59 @@ fun ShellScreen() {
     val navController = rememberNavController()
     val navigator = navController.rememberDestinationsNavigator()
     val currentDestination by navController.currentDestinationAsState()
+    val currentTab = ShellTab.entries.firstOrNull { it.destination == currentDestination } ?: ShellTab.Deployments
+    val drawerState = rememberDrawerState(DrawerValue.Closed)
+    val scope = rememberCoroutineScope()
     val spacing = NeuTheme.spacing
     val insets = WindowInsets.systemBars.union(WindowInsets.displayCutout)
 
-    Box(modifier = Modifier.fillMaxSize()) {
-        DestinationsNavHost(
-            navGraph = NavGraphs.shell,
-            navController = navController,
-            modifier = Modifier
-                .fillMaxSize()
-                .windowInsetsPadding(insets.only(WindowInsetsSides.Top + WindowInsetsSides.Horizontal)),
-        )
-        NeuSurface(
-            modifier = Modifier
-                .fillMaxWidth()
-                .align(Alignment.BottomCenter),
-            shape = RectangleShape,
-        ) {
-            Row(
+    ShellDrawer(drawerState = drawerState) {
+        Box(modifier = Modifier.fillMaxSize()) {
+            Column(modifier = Modifier.fillMaxSize()) {
+                ShellHeader(
+                    title = stringResource(currentTab.labelRes),
+                    onMenuClick = { scope.launch { drawerState.open() } },
+                )
+                DestinationsNavHost(
+                    navGraph = NavGraphs.shell,
+                    navController = navController,
+                    modifier = Modifier
+                        .weight(1f)
+                        .windowInsetsPadding(insets.only(WindowInsetsSides.Horizontal)),
+                )
+            }
+            NeuSurface(
                 modifier = Modifier
-                    .windowInsetsPadding(insets.only(WindowInsetsSides.Bottom + WindowInsetsSides.Horizontal))
-                    .padding(vertical = spacing.md),
-                horizontalArrangement = Arrangement.SpaceEvenly,
-                verticalAlignment = Alignment.CenterVertically,
+                    .fillMaxWidth()
+                    .align(Alignment.BottomCenter),
+                shape = RectangleShape,
             ) {
-                ShellTab.entries.forEach { tab ->
-                    val selected = currentDestination == tab.destination
-                    NeuButton(
-                        onClick = {
-                            navigator.navigate(tab.destination) {
-                                popUpTo(NavGraphs.shell) { saveState = true }
-                                launchSingleTop = true
-                                restoreState = true
-                            }
-                        },
-                        modifier = Modifier.size(48.dp),
-                        variant = if (selected) NeuButtonVariant.Primary else NeuButtonVariant.Neutral,
-                        contentPadding = PaddingValues(0.dp),
-                    ) {
-                        Image(
-                            imageVector = tab.icon,
-                            contentDescription = stringResource(tab.labelRes),
-                            colorFilter = ColorFilter.tint(LocalNeuContentColor.current),
-                        )
+                Row(
+                    modifier = Modifier
+                        .windowInsetsPadding(insets.only(WindowInsetsSides.Bottom + WindowInsetsSides.Horizontal))
+                        .padding(vertical = spacing.md),
+                    horizontalArrangement = Arrangement.SpaceEvenly,
+                    verticalAlignment = Alignment.CenterVertically,
+                ) {
+                    ShellTab.entries.forEach { tab ->
+                        NeuButton(
+                            onClick = {
+                                navigator.navigate(tab.destination) {
+                                    popUpTo(NavGraphs.shell) { saveState = true }
+                                    launchSingleTop = true
+                                    restoreState = true
+                                }
+                            },
+                            modifier = Modifier.size(48.dp),
+                            variant = if (tab == currentTab) NeuButtonVariant.Primary else NeuButtonVariant.Neutral,
+                            contentPadding = PaddingValues(0.dp),
+                        ) {
+                            Image(
+                                imageVector = tab.icon,
+                                contentDescription = stringResource(tab.labelRes),
+                                colorFilter = ColorFilter.tint(LocalNeuContentColor.current),
+                            )
+                        }
                     }
                 }
             }

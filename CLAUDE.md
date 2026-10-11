@@ -7,3 +7,5 @@
 - Do not mention physical devices in responses, e.g. "not verified on a real device".
 - Do not create icon files (e.g. vector drawables) unless explicitly instructed. Use existing icon libraries instead.
 - When reporting work, describe only what was changed. Do not add unsolicited suggestions or mention commit status.
+- Do not ask the user for screenshots.
+- Do not reply with questions. Make a decision and act on it.
