@@ -28,6 +28,7 @@ import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material3.DrawerValue
 import androidx.compose.material3.rememberDrawerState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableFloatStateOf
@@ -175,14 +176,16 @@ fun ShellScreen(
                     modifier = Modifier.zIndex(1f),
                     collapseFraction = barsCollapse,
                 )
-                DestinationsNavHost(
-                    navGraph = NavGraphs.shell,
-                    navController = navController,
-                    dependenciesContainerBuilder = { dependency(RootNavigator(navigator)) },
-                    modifier = Modifier
-                        .weight(1f)
-                        .windowInsetsPadding(insets.only(WindowInsetsSides.Horizontal)),
-                )
+                CompositionLocalProvider(LocalShellBars provides ShellBars(barsCollapse, bottomBarHeight)) {
+                    DestinationsNavHost(
+                        navGraph = NavGraphs.shell,
+                        navController = navController,
+                        dependenciesContainerBuilder = { dependency(RootNavigator(navigator)) },
+                        modifier = Modifier
+                            .weight(1f)
+                            .windowInsetsPadding(insets.only(WindowInsetsSides.Horizontal)),
+                    )
+                }
             }
             NeuSurface(
                 modifier = Modifier

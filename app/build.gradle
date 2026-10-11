@@ -5,6 +5,7 @@ plugins {
     alias(libs.plugins.com.google.devtools.ksp)
     alias(libs.plugins.org.jetbrains.kotlin.plugin.compose)
     alias(libs.plugins.org.jetbrains.kotlin.plugin.serialization)
+    alias(libs.plugins.secrets.gradle.plugin)
     id('kotlin-parcelize')
     // id("com.google.gms.google-services") // Google Play Services
     // id("com.google.firebase.crashlytics") // Google Play Services
@@ -12,7 +13,6 @@ plugins {
 hilt {
     enableAggregatingTask = true
 }
-
 android {
     namespace 'com.karasu256.vcnative'
     compileSdk appCompileSdkVersion
@@ -25,6 +25,8 @@ android {
         versionName "1.0"
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+        buildConfigField "String", "GITHUB_APP_ID", "\"${project.findProperty('github.appId') ?: ''}\""
+        buildConfigField "String", "GITHUB_CLIENT_ID", "\"${project.findProperty('github.clientId') ?: ''}\""
         vectorDrawables {
             useSupportLibrary true
         }
@@ -42,6 +44,7 @@ android {
     }
     buildFeatures {
         compose true
+        buildConfig true
     }
     packagingOptions {
         resources {
@@ -110,6 +113,7 @@ dependencies {
     implementation(libs.compose.destinations.core)
     ksp(libs.compose.destinations.ksp)
     implementation(libs.androidsvg)
+    implementation(libs.compose.icons.simple.icons)
 
     implementation(libs.lifecycle.viewmodel.compose)
     implementation(libs.lifecycle.runtime.compose)

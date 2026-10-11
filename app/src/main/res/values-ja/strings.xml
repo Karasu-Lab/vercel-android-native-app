@@ -39,4 +39,13 @@
     <string name="label_regions">リージョン</string>
     <string name="environment_production">本番</string>
     <string name="environment_preview">プレビュー</string>
+    <string name="create_deployment">デプロイを作成</string>
+    <string name="select_project">プロジェクトを選択</string>
+    <string name="select_branch">ブランチを選択してください</string>
+    <string name="deploy">デプロイ</string>
+    <string name="cancel">キャンセル</string>
+    <string name="link_github">GitHub と連携</string>
+    <string name="github_linked">GitHub と連携済み</string>
+    <string name="unlink_github">連携解除</string>
+    <string name="error_create_deployment">デプロイを作成できませんでした。</string>
 </resources>

@@ -2,6 +2,7 @@ package com.karasu256.vcnative.ui.theme
 
 import android.os.Build
 import androidx.compose.foundation.isSystemInDarkTheme
+import androidx.compose.material3.LocalContentColor
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Shapes
 import androidx.compose.material3.Typography
@@ -41,17 +42,28 @@ object NeuTheme {
 
     val statusColors: NeuStatusColors
         @Composable @ReadOnlyComposable get() = LocalNeuStatusColors.current
+
+    val fab: NeuFabStyle
+        @Composable @ReadOnlyComposable get() = LocalNeuFabStyle.current
+
+    val linkButton: NeuLinkButtonStyle
+        @Composable @ReadOnlyComposable get() = LocalNeuLinkButtonStyle.current
+
+    val chip: NeuChipStyle
+        @Composable @ReadOnlyComposable get() = LocalNeuChipStyle.current
 }
 
 @Composable
 fun NeuTheme(
-    darkTheme: Boolean = isSystemInDarkTheme(),
-    content: @Composable () -> Unit
+    darkTheme: Boolean = isSystemInDarkTheme(), content: @Composable () -> Unit
 ) {
     val context = LocalContext.current
     val scheme = remember(context, darkTheme) {
         when {
-            Build.VERSION.SDK_INT >= Build.VERSION_CODES.S && darkTheme -> dynamicDarkColorScheme(context)
+            Build.VERSION.SDK_INT >= Build.VERSION_CODES.S && darkTheme -> dynamicDarkColorScheme(
+                context
+            )
+
             Build.VERSION.SDK_INT >= Build.VERSION_CODES.S -> dynamicLightColorScheme(context)
             darkTheme -> darkColorScheme()
             else -> lightColorScheme()
@@ -67,10 +79,21 @@ fun NeuTheme(
             background = colors.surface,
             onBackground = colors.onSurface,
             surface = colors.surface,
+            surfaceVariant = colors.field,
+            surfaceTint = colors.surface,
+            surfaceBright = colors.surface,
+            surfaceDim = colors.surface,
+            surfaceContainerLowest = colors.surface,
             surfaceContainerLow = colors.surface,
+            surfaceContainer = colors.surface,
+            surfaceContainerHigh = colors.surface,
+            surfaceContainerHighest = colors.surface,
             onSurface = colors.onSurface,
             onSurfaceVariant = colors.onSurfaceMuted,
+            secondaryContainer = colors.field,
+            onSecondaryContainer = colors.primary,
             outline = colors.outline,
+            outlineVariant = colors.outline,
             error = colors.danger,
         )
     }
@@ -104,7 +127,11 @@ fun NeuTheme(
             LocalNeuMotion provides NeuMotion(),
             LocalNeuBarStyle provides NeuBarStyle(),
             LocalNeuStatusColors provides statusColors,
+            LocalNeuFabStyle provides NeuFabStyle(),
+            LocalNeuLinkButtonStyle provides NeuLinkButtonStyle(),
+            LocalNeuChipStyle provides NeuChipStyle(),
             LocalNeuContentColor provides colors.onSurface,
+            LocalContentColor provides colors.onSurface,
             LocalNeuTextStyle provides DefaultNeuTypography.bodyMedium,
             LocalTextSelectionColors provides selectionColors,
             content = content

@@ -28,6 +28,8 @@ room = "2.8.5"
 ktor = "3.6.0"
 compose-destinations = "2.3.0"
 androidsvg = "1.4"
+secrets-gradle-plugin = "2.0.1"
+compose-icons = "1.1.1"
 hilt = "2.60.1"
 fragment = "1.9.0"
 lifecycle = "2.10.0"
@@ -101,6 +103,7 @@ ktor-serialization-kotlinx-json = { module = "io.ktor:ktor-serialization-kotlinx
 compose-destinations-core = { module = "io.github.raamcosta.compose-destinations:core", version.ref = "compose-destinations" }
 compose-destinations-ksp = { module = "io.github.raamcosta.compose-destinations:ksp", version.ref = "compose-destinations" }
 androidsvg = { module = "com.caverock:androidsvg-aar", version.ref = "androidsvg" }
+compose-icons-simple-icons = { module = "br.com.devsrsouza.compose.icons:simple-icons", version.ref = "compose-icons" }
 
 retrofit = { module = "com.squareup.retrofit2:retrofit", version.ref = "retrofit" }
 converter-gson = { module = "com.squareup.retrofit2:converter-gson", version.ref = "retrofit" }
@@ -120,6 +123,7 @@ com-android-library = { id = "com.android.library", version.ref = "agp" }
 
 com-google-dagger-hilt-android = { id = "com.google.dagger.hilt.android", version.ref = "hilt" }
 com-google-devtools-ksp = { id = "com.google.devtools.ksp", version.ref = "ksp" }
+secrets-gradle-plugin = { id = "com.google.android.libraries.mapsplatform.secrets-gradle-plugin", version.ref = "secrets-gradle-plugin" }
 
 org-jetbrains-kotlin-android = { id = "org.jetbrains.kotlin.android", version.ref = "org-jetbrains-kotlin-android" }
 org-jetbrains-kotlin-jvm = { id = "org.jetbrains.kotlin.jvm", version.ref = "org-jetbrains-kotlin-android" }
