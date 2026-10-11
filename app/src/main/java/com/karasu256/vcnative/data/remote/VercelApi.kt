@@ -4,7 +4,11 @@ import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.graphics.Canvas
 import com.caverock.androidsvg.SVG
+import com.karasu256.vcnative.data.model.CreateDeploymentRequestDto
 import com.karasu256.vcnative.data.model.DeploymentDetailDto
+import com.karasu256.vcnative.data.model.DeploymentDto
+import com.karasu256.vcnative.data.model.ProjectDto
+import com.karasu256.vcnative.data.model.ProjectsResponseDto
 import com.karasu256.vcnative.data.model.DeploymentStatusDto
 import com.karasu256.vcnative.data.model.DeploymentsResponseDto
 import com.karasu256.vcnative.data.model.VercelEvent
@@ -15,6 +19,10 @@ import io.ktor.client.call.body
 import io.ktor.client.request.bearerAuth
 import io.ktor.client.request.get
 import io.ktor.client.request.parameter
+import io.ktor.client.request.post
+import io.ktor.client.request.setBody
+import io.ktor.http.ContentType
+import io.ktor.http.contentType
 import io.ktor.client.request.prepareGet
 import io.ktor.client.statement.bodyAsChannel
 import io.ktor.utils.io.readUTF8Line
@@ -80,11 +88,43 @@ class VercelApi @Inject constructor(
         }
     }
 
-    suspend fun getAvatarBitmap(username: String, size: Int): Bitmap? {
-        val bytes = client.get(AVATAR_URL) {
-            parameter("u", username)
-            parameter("s", size)
-        }.body<ByteArray>()
+    suspend fun getProjects(apiKey: String): List<ProjectDto> =
+        client.get("$BASE_URL/v10/projects") {
+            bearerAuth(apiKey)
+            parameter("limit", 100)
+        }.body<ProjectsResponseDto>().projects
+
+    suspend fun getProjectDeployments(apiKey: String, projectId: String): List<DeploymentDto> =
+        client.get("$BASE_URL/v6/deployments") {
+            bearerAuth(apiKey)
+            parameter("projectId", projectId)
+            parameter("limit", 100)
+        }.body<DeploymentsResponseDto>().deployments
+
+    suspend fun createDeployment(apiKey: String, request: CreateDeploymentRequestDto) {
+        client.post("$BASE_URL/v13/deployments") {
+            bearerAuth(apiKey)
+            contentType(ContentType.Application.Json)
+            setBody(request)
+        }
+    }
+
+    suspend fun getAvatarBitmap(username: String, size: Int): Bitmap? =
+        decodeAvatar(
+            client.get(AVATAR_URL) {
+                parameter("u", username)
+                parameter("s", size)
+            }.body(),
+            size,
+        )
+
+    suspend fun getAvatarBitmapByHash(hash: String, size: Int): Bitmap? =
+        decodeAvatar(
+            client.get("$AVATAR_URL/$hash") { parameter("s", size) }.body(),
+            size,
+        )
+
+    private fun decodeAvatar(bytes: ByteArray, size: Int): Bitmap? {
         return BitmapFactory.decodeByteArray(bytes, 0, bytes.size) ?: runCatching {
             val svg = SVG.getFromString(bytes.decodeToString())
             Bitmap.createBitmap(size, size, Bitmap.Config.ARGB_8888).also {

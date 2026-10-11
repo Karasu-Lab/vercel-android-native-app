@@ -16,6 +16,7 @@ import androidx.compose.foundation.layout.defaultMinSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.LocalContentColor
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.getValue
@@ -24,6 +25,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.graphics.lerp
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.unit.dp
@@ -48,12 +50,12 @@ fun NeuButton(
         horizontal = NeuTheme.spacing.xl,
         vertical = NeuTheme.spacing.md,
     ),
+    shape: Shape = NeuTheme.shapes.md,
+    depth: NeuDepth = NeuTheme.elevation.medium,
     content: @Composable RowScope.() -> Unit
 ) {
     val colors = NeuTheme.colors
-    val shape = NeuTheme.shapes.md
     val spacing = NeuTheme.spacing
-    val depth = NeuTheme.elevation.medium
     val motion = NeuTheme.motion
     val source = interactionSource ?: remember { MutableInteractionSource() }
     val pressed by source.collectIsPressedAsState()
@@ -106,6 +108,7 @@ fun NeuButton(
     ) {
         CompositionLocalProvider(
             LocalNeuContentColor provides contentColor,
+            LocalContentColor provides contentColor,
             LocalNeuTextStyle provides NeuTheme.typography.button,
         ) {
             AnimatedContent(

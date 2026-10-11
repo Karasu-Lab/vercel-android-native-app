@@ -59,6 +59,9 @@ data class DeploymentMetaDto(
     val bitbucketCommitMessage: String? = null,
     val githubCommitRef: String? = null,
     val githubCommitSha: String? = null,
+    val githubCommitAuthorName: String? = null,
+    val githubRepo: String? = null,
+    val githubOrg: String? = null,
     val gitlabCommitRef: String? = null,
     val bitbucketCommitRef: String? = null,
 )

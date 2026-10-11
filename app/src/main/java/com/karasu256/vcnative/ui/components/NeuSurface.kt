@@ -6,6 +6,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.LocalContentColor
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.ui.Modifier
@@ -42,7 +43,10 @@ fun NeuSurface(
         modifier = modifier.neuSurface(style, shape, color, depth, colors),
         propagateMinConstraints = true,
     ) {
-        CompositionLocalProvider(LocalNeuContentColor provides contentColor) {
+        CompositionLocalProvider(
+            LocalNeuContentColor provides contentColor,
+            LocalContentColor provides contentColor,
+        ) {
             content()
         }
     }
