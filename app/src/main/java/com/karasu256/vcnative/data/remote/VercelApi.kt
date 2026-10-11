@@ -6,6 +6,7 @@ import io.ktor.client.HttpClient
 import io.ktor.client.call.body
 import io.ktor.client.request.bearerAuth
 import io.ktor.client.request.get
+import io.ktor.client.request.parameter
 import javax.inject.Inject
 import javax.inject.Singleton
 
@@ -18,7 +19,14 @@ class VercelApi @Inject constructor(
             .body<VercelUserResponse>()
             .user
 
+    suspend fun getAvatar(username: String, size: Int): ByteArray =
+        client.get(AVATAR_URL) {
+            parameter("u", username)
+            parameter("s", size)
+        }.body()
+
     companion object {
         const val BASE_URL = "https://api.vercel.com"
+        const val AVATAR_URL = "https://api.vercel.com/www/avatar"
     }
 }

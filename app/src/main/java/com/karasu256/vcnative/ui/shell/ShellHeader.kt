@@ -21,7 +21,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.ColorFilter
-import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.karasu256.vcnative.R
@@ -42,7 +41,8 @@ fun ShellHeader(
 
     NeuSurface(
         modifier = modifier.fillMaxWidth(),
-        shape = RectangleShape,
+        shape = NeuTheme.bar.shape,
+        depth = NeuTheme.bar.depth,
     ) {
         Row(
             modifier = Modifier
@@ -52,7 +52,7 @@ fun ShellHeader(
                         .union(WindowInsets.displayCutout)
                         .only(WindowInsetsSides.Horizontal)
                 )
-                .padding(horizontal = spacing.lg),
+                .padding(start = spacing.lg, end = spacing.lg, bottom = spacing.sm),
             horizontalArrangement = Arrangement.spacedBy(spacing.lg),
             verticalAlignment = Alignment.CenterVertically,
         ) {

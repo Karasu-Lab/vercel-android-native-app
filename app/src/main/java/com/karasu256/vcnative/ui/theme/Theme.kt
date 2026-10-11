@@ -2,6 +2,9 @@ package com.karasu256.vcnative.ui.theme
 
 import android.os.Build
 import androidx.compose.foundation.isSystemInDarkTheme
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Shapes
+import androidx.compose.material3.Typography
 import androidx.compose.material3.darkColorScheme
 import androidx.compose.material3.dynamicDarkColorScheme
 import androidx.compose.material3.dynamicLightColorScheme
@@ -32,6 +35,9 @@ object NeuTheme {
 
     val motion: NeuMotion
         @Composable @ReadOnlyComposable get() = LocalNeuMotion.current
+
+    val bar: NeuBarStyle
+        @Composable @ReadOnlyComposable get() = LocalNeuBarStyle.current
 }
 
 @Composable
@@ -40,14 +46,36 @@ fun NeuTheme(
     content: @Composable () -> Unit
 ) {
     val context = LocalContext.current
-    val colors = remember(context, darkTheme) {
-        val scheme = when {
+    val scheme = remember(context, darkTheme) {
+        when {
             Build.VERSION.SDK_INT >= Build.VERSION_CODES.S && darkTheme -> dynamicDarkColorScheme(context)
             Build.VERSION.SDK_INT >= Build.VERSION_CODES.S -> dynamicLightColorScheme(context)
             darkTheme -> darkColorScheme()
             else -> lightColorScheme()
         }
-        neuColorsOf(scheme, darkTheme)
+    }
+    val colors = remember(scheme, darkTheme) { neuColorsOf(scheme, darkTheme) }
+    val shapes = remember { NeuShapes() }
+    val materialColorScheme = remember(scheme, colors) {
+        scheme.copy(
+            primary = colors.primary,
+            onPrimary = colors.onPrimary,
+            surface = colors.surface,
+            surfaceContainerLow = colors.surface,
+            onSurface = colors.onSurface,
+            onSurfaceVariant = colors.onSurfaceMuted,
+            outline = colors.outline,
+            error = colors.danger,
+        )
+    }
+    val materialShapes = remember(shapes) {
+        Shapes(
+            extraSmall = shapes.sm,
+            small = shapes.sm,
+            medium = shapes.md,
+            large = shapes.lg,
+            extraLarge = shapes.lg,
+        )
     }
     val selectionColors = remember(colors) {
         TextSelectionColors(
@@ -56,16 +84,35 @@ fun NeuTheme(
         )
     }
 
-    CompositionLocalProvider(
-        LocalNeuColors provides colors,
-        LocalNeuTypography provides DefaultNeuTypography,
-        LocalNeuShapes provides NeuShapes(),
-        LocalNeuSpacing provides NeuSpacing(),
-        LocalNeuElevation provides NeuElevation(),
-        LocalNeuMotion provides NeuMotion(),
-        LocalNeuContentColor provides colors.onSurface,
-        LocalNeuTextStyle provides DefaultNeuTypography.bodyMedium,
-        LocalTextSelectionColors provides selectionColors,
-        content = content
-    )
+    MaterialTheme(
+        colorScheme = materialColorScheme,
+        shapes = materialShapes,
+        typography = NeuMaterialTypography,
+    ) {
+        CompositionLocalProvider(
+            LocalNeuColors provides colors,
+            LocalNeuTypography provides DefaultNeuTypography,
+            LocalNeuShapes provides shapes,
+            LocalNeuSpacing provides NeuSpacing(),
+            LocalNeuElevation provides NeuElevation(),
+            LocalNeuMotion provides NeuMotion(),
+            LocalNeuBarStyle provides NeuBarStyle(),
+            LocalNeuContentColor provides colors.onSurface,
+            LocalNeuTextStyle provides DefaultNeuTypography.bodyMedium,
+            LocalTextSelectionColors provides selectionColors,
+            content = content
+        )
+    }
 }
+
+private val NeuMaterialTypography = Typography(
+    headlineSmall = DefaultNeuTypography.headline,
+    titleLarge = DefaultNeuTypography.title,
+    titleMedium = DefaultNeuTypography.button,
+    bodyLarge = DefaultNeuTypography.bodyMedium,
+    bodyMedium = DefaultNeuTypography.bodySmall,
+    bodySmall = DefaultNeuTypography.bodySmall,
+    labelLarge = DefaultNeuTypography.button,
+    labelMedium = DefaultNeuTypography.labelCaps,
+    labelSmall = DefaultNeuTypography.labelCaps,
+)
