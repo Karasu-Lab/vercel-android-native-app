@@ -42,16 +42,16 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.ColorFilter
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.input.nestedscroll.NestedScrollConnection
 import androidx.compose.ui.input.nestedscroll.NestedScrollSource
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.layout.onSizeChanged
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.Velocity
-import androidx.compose.ui.zIndex
-import androidx.compose.ui.graphics.vector.ImageVector
-import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.zIndex
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.compose.rememberNavController
@@ -60,6 +60,7 @@ import com.karasu256.vcnative.ui.activitys.AppThemeViewModel
 import com.karasu256.vcnative.ui.components.NeuButton
 import com.karasu256.vcnative.ui.components.NeuButtonVariant
 import com.karasu256.vcnative.ui.components.NeuSurface
+import com.karasu256.vcnative.ui.deployments.create.ProjectSelectDialog
 import com.karasu256.vcnative.ui.theme.LocalNeuContentColor
 import com.karasu256.vcnative.ui.theme.NeuTheme
 import com.ramcosta.composedestinations.DestinationsNavHost
@@ -100,7 +101,8 @@ fun ShellScreen(
     val navController = rememberNavController()
     val tabNavigator = navController.rememberDestinationsNavigator()
     val currentDestination by navController.currentDestinationAsState()
-    val currentTab = ShellTab.entries.firstOrNull { it.destination == currentDestination } ?: ShellTab.Deployments
+    val currentTab = ShellTab.entries.firstOrNull { it.destination == currentDestination }
+        ?: ShellTab.Deployments
     val drawerState = rememberDrawerState(DrawerValue.Closed)
     val scope = rememberCoroutineScope()
     val spacing = NeuTheme.spacing
@@ -150,12 +152,22 @@ fun ShellScreen(
             onLogout = viewModel::logout,
             onDismissRequest = viewModel::dismissSheet,
         )
+
         ShellSheet.Theme -> ThemeSheet(
             current = appTheme,
             onSelect = appThemeViewModel::select,
             onDismissRequest = viewModel::dismissSheet,
         )
+
         null -> Unit
+    }
+
+    if (uiState.isProjectDialogOpen) {
+        ProjectSelectDialog(
+            projects = uiState.projects,
+            onSelect = viewModel::selectFilterProject,
+            onDismissRequest = viewModel::dismissProjectDialog,
+        )
     }
 
     ShellDrawer(
@@ -175,8 +187,24 @@ fun ShellScreen(
                     onMenuClick = { scope.launch { drawerState.open() } },
                     modifier = Modifier.zIndex(1f),
                     collapseFraction = barsCollapse,
+                    trailing = if (currentTab == ShellTab.Deployments) {
+                        {
+                            ShellProjectFilter(
+                                project = uiState.filterProject,
+                                onClick = viewModel::openProjectDialog,
+                                onClear = viewModel::clearFilterProject,
+                            )
+                        }
+                    } else {
+                        null
+                    },
                 )
-                CompositionLocalProvider(LocalShellBars provides ShellBars(barsCollapse, bottomBarHeight)) {
+                CompositionLocalProvider(
+                    LocalShellBars provides ShellBars(
+                        barsCollapse,
+                        bottomBarHeight
+                    )
+                ) {
                     DestinationsNavHost(
                         navGraph = NavGraphs.shell,
                         navController = navController,

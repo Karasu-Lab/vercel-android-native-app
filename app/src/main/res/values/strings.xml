@@ -49,4 +49,6 @@
     <string name="github_linked">GitHub linked</string>
     <string name="unlink_github">Unlink</string>
     <string name="error_create_deployment">Failed to create the deployment.</string>
+    <string name="all_projects">All projects</string>
+    <string name="clear_project_filter">Clear project filter</string>
 </resources>

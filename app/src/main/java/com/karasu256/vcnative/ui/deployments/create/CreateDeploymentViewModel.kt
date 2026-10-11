@@ -8,6 +8,7 @@ import com.karasu256.vcnative.data.model.Branch
 import com.karasu256.vcnative.data.repository.BranchRepository
 import com.karasu256.vcnative.data.repository.DeploymentRepository
 import com.karasu256.vcnative.data.repository.GitHubAuthRepository
+import com.karasu256.vcnative.data.repository.ProjectFilterRepository
 import com.karasu256.vcnative.data.repository.ProjectRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Job
@@ -25,6 +26,7 @@ class CreateDeploymentViewModel @Inject constructor(
     private val branchRepository: BranchRepository,
     private val deploymentRepository: DeploymentRepository,
     private val gitHubAuthRepository: GitHubAuthRepository,
+    private val projectFilterRepository: ProjectFilterRepository,
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(CreateDeploymentUiState())
@@ -38,6 +40,19 @@ class CreateDeploymentViewModel @Inject constructor(
 
     init {
         viewModelScope.launch {
+            projectRepository.projects.collect { projects ->
+                val items = projects?.map { ProjectItem(it.project, it.avatar?.asImageBitmap()) }
+                _uiState.update { state ->
+                    state.copy(
+                        projects = items,
+                        selectedProject = state.selectedProject?.let { selected ->
+                            items?.firstOrNull { it.project.id == selected.project.id } ?: selected
+                        },
+                    )
+                }
+            }
+        }
+        viewModelScope.launch {
             gitHubAuthRepository.restore()
             gitHubAuthRepository.isAuthenticated.collect { linked ->
                 val changed = _uiState.value.isGitHubLinked != linked
@@ -49,25 +64,11 @@ class CreateDeploymentViewModel @Inject constructor(
 
     fun openSheet() {
         _uiState.update { it.copy(isSheetOpen = true, errorRes = null) }
-        if (_uiState.value.projects != null) return
-        viewModelScope.launch {
-            val projects = projectRepository.getProjects()
-            _uiState.update { state -> state.copy(projects = projects.map { ProjectItem(it) }) }
-            projects.filter { it.avatarHash != null }.forEach { project ->
-                launch {
-                    val avatar = projectRepository.getAvatar(project, 64)?.asImageBitmap() ?: return@launch
-                    val withAvatar = { item: ProjectItem ->
-                        if (item.project.id == project.id) item.copy(avatar = avatar) else item
-                    }
-                    _uiState.update { state ->
-                        state.copy(
-                            projects = state.projects?.map(withAvatar),
-                            selectedProject = state.selectedProject?.let(withAvatar),
-                        )
-                    }
-                }
-            }
-        }
+        viewModelScope.launch { projectRepository.load() }
+        val filter = projectFilterRepository.selected.value ?: return
+        if (_uiState.value.selectedProject?.project?.id == filter.id) return
+        val item = _uiState.value.projects?.firstOrNull { it.project.id == filter.id } ?: ProjectItem(filter)
+        selectProject(item)
     }
 
     fun dismissSheet() {

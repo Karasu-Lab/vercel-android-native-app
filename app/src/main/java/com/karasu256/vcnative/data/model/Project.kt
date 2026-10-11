@@ -1,5 +1,12 @@
 package com.karasu256.vcnative.data.model
 
+import android.graphics.Bitmap
+
+data class ProjectWithAvatar(
+    val project: Project,
+    val avatar: Bitmap? = null,
+)
+
 data class Project(
     val id: String,
     val name: String,

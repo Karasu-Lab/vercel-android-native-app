@@ -10,6 +10,7 @@ import com.karasu256.vcnative.data.model.isInProgress
 import com.karasu256.vcnative.data.remote.DeploymentStatusTracker
 import com.karasu256.vcnative.data.remote.VercelApi
 import com.karasu256.vcnative.data.repository.ApiKeyRepository
+import com.karasu256.vcnative.data.repository.ProjectFilterRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.Job
@@ -25,6 +26,7 @@ class DeploymentsViewModel @Inject constructor(
     private val apiKeyRepository: ApiKeyRepository,
     private val api: VercelApi,
     private val statusTracker: DeploymentStatusTracker,
+    private val projectFilterRepository: ProjectFilterRepository,
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(DeploymentsUiState())
@@ -32,6 +34,7 @@ class DeploymentsViewModel @Inject constructor(
 
     private var apiKey: String? = null
     private var nextCursor: Long? = null
+    private var projectId: String? = null
     private var loadJob: Job? = null
     private val followJobs = mutableMapOf<String, Job>()
     private val avatars = mutableMapOf<String, ImageBitmap>()
@@ -41,7 +44,12 @@ class DeploymentsViewModel @Inject constructor(
         viewModelScope.launch {
             val key = apiKeyRepository.read() ?: return@launch
             apiKey = key
-            loadMore()
+            launch {
+                projectFilterRepository.selected.collect { project ->
+                    projectId = project?.id
+                    reload()
+                }
+            }
 
             while (true) {
                 delay(5000)
@@ -50,7 +58,7 @@ class DeploymentsViewModel @Inject constructor(
                 val known = state.newDeployments + state.deployments
                 val latest = known.maxOfOrNull { it.createdAt } ?: continue
                 val found = try {
-                    api.getDeployments(key, since = latest).deployments
+                    api.getDeployments(key, since = latest, projectId = projectId).deployments
                 } catch (e: CancellationException) {
                     throw e
                 } catch (e: Exception) {
@@ -86,8 +94,12 @@ class DeploymentsViewModel @Inject constructor(
     }
 
     fun refresh() {
-        val key = apiKey ?: return
         if (_uiState.value.isRefreshing) return
+        reload()
+    }
+
+    private fun reload() {
+        val key = apiKey ?: return
         loadJob?.cancel()
         followJobs.values.forEach { it.cancel() }
         followJobs.clear()
@@ -115,7 +127,7 @@ class DeploymentsViewModel @Inject constructor(
 
     private suspend fun loadPage(apiKey: String, reset: Boolean) {
         val page = try {
-            api.getDeployments(apiKey, until = nextCursor)
+            api.getDeployments(apiKey, until = nextCursor, projectId = projectId)
         } catch (e: CancellationException) {
             throw e
         } catch (e: Exception) {
