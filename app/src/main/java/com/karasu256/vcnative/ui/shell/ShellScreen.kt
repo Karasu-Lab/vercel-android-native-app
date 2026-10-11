@@ -47,6 +47,7 @@ import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.layout.onSizeChanged
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.Velocity
+import androidx.compose.ui.zIndex
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
@@ -170,6 +171,7 @@ fun ShellScreen(
                 ShellHeader(
                     title = stringResource(currentTab.labelRes),
                     onMenuClick = { scope.launch { drawerState.open() } },
+                    modifier = Modifier.zIndex(1f),
                     collapseFraction = barsCollapse,
                 )
                 DestinationsNavHost(

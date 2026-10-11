@@ -21,6 +21,7 @@ data class NeuShapes(
     val sm: RoundedCornerShape = RoundedCornerShape(4.dp),
     val md: RoundedCornerShape = RoundedCornerShape(8.dp),
     val lg: RoundedCornerShape = RoundedCornerShape(24.dp),
+    val pill: RoundedCornerShape = RoundedCornerShape(50),
 )
 
 internal val LocalNeuSpacing = staticCompositionLocalOf { NeuSpacing() }

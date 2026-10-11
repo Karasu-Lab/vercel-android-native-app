@@ -5,7 +5,7 @@ import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
 import io.ktor.client.HttpClient
-import io.ktor.client.engine.android.Android
+import io.ktor.client.engine.cio.CIO
 import io.ktor.client.plugins.contentnegotiation.ContentNegotiation
 import io.ktor.client.plugins.logging.LogLevel
 import io.ktor.client.plugins.logging.Logging
@@ -26,7 +26,8 @@ object NetworkModule {
 
     @Provides
     @Singleton
-    fun provideHttpClient(json: Json): HttpClient = HttpClient(Android) {
+    fun provideHttpClient(json: Json): HttpClient = HttpClient(CIO) {
+        engine { requestTimeout = 0 }
         expectSuccess = true
         install(ContentNegotiation) { json(json) }
         install(Logging) { level = LogLevel.INFO }

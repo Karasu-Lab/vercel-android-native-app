@@ -37,11 +37,13 @@ class VercelApi @Inject constructor(
         apiKey: String,
         limit: Int = 10,
         until: Long? = null,
+        since: Long? = null,
     ): DeploymentsResponseDto =
         client.get("$BASE_URL/v6/deployments") {
             bearerAuth(apiKey)
             parameter("limit", limit)
             until?.let { parameter("until", it) }
+            since?.let { parameter("since", it) }
         }.body()
 
     suspend fun getDeploymentStatus(apiKey: String, id: String): DeploymentStatusDto =

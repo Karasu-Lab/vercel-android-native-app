@@ -36,8 +36,31 @@ class DeploymentsViewModel @Inject constructor(
 
     init {
         viewModelScope.launch {
-            apiKey = apiKeyRepository.read() ?: return@launch
+            val key = apiKeyRepository.read() ?: return@launch
+            apiKey = key
             loadMore()
+
+            while (true) {
+                delay(5000)
+                val state = _uiState.value
+                if (state.isRefreshing) continue
+                val known = state.newDeployments + state.deployments
+                val latest = known.maxOfOrNull { it.createdAt } ?: continue
+                val found = try {
+                    api.getDeployments(key, since = latest).deployments
+                } catch (e: CancellationException) {
+                    throw e
+                } catch (e: Exception) {
+                    continue
+                }
+                val knownIds = known.map { it.id }.toSet()
+                val fresh = found.map { it.toDeploymentInfo() }.filter { it.id !in knownIds }
+                if (fresh.isEmpty()) continue
+                _uiState.update {
+                    it.copy(newDeployments = (fresh + it.newDeployments).sortedByDescending { deployment -> deployment.createdAt })
+                }
+                loadAvatars(fresh)
+            }
         }
 
         viewModelScope.launch {
@@ -66,8 +89,18 @@ class DeploymentsViewModel @Inject constructor(
         followJobs.values.forEach { it.cancel() }
         followJobs.clear()
         nextCursor = null
-        _uiState.update { it.copy(isRefreshing = true, isLoadingMore = false, hasMore = true) }
+        _uiState.update {
+            it.copy(isRefreshing = true, isLoadingMore = false, hasMore = true, newDeployments = emptyList())
+        }
         loadJob = viewModelScope.launch { loadPage(key, reset = true) }
+    }
+
+    fun showNewDeployments() {
+        val key = apiKey ?: return
+        val fresh = _uiState.value.newDeployments
+        if (fresh.isEmpty()) return
+        _uiState.update { it.copy(deployments = fresh + it.deployments, newDeployments = emptyList()) }
+        fresh.filter { it.state.isInProgress }.forEach { follow(key, it.id) }
     }
 
     fun loadMore() {
@@ -107,7 +140,10 @@ class DeploymentsViewModel @Inject constructor(
         }
 
         deployments.filter { it.state.isInProgress }.forEach { follow(apiKey, it.id) }
+        loadAvatars(deployments)
+    }
 
+    private fun loadAvatars(deployments: List<DeploymentInfo>) {
         deployments.flatMap { it.creators }
             .map { it.username }
             .filter { requestedAvatars.add(it) }
@@ -125,15 +161,17 @@ class DeploymentsViewModel @Inject constructor(
                         return@launch
                     }
                     avatars[username] = avatar
+                    val withAvatar = { deployment: DeploymentInfo ->
+                        deployment.copy(
+                            creators = deployment.creators.map { creator ->
+                                if (creator.username == username) creator.copy(avatar = avatar) else creator
+                            }
+                        )
+                    }
                     _uiState.update { state ->
                         state.copy(
-                            deployments = state.deployments.map { deployment ->
-                                deployment.copy(
-                                    creators = deployment.creators.map { creator ->
-                                        if (creator.username == username) creator.copy(avatar = avatar) else creator
-                                    }
-                                )
-                            }
+                            deployments = state.deployments.map(withAvatar),
+                            newDeployments = state.newDeployments.map(withAvatar),
                         )
                     }
                 }
@@ -145,9 +183,11 @@ class DeploymentsViewModel @Inject constructor(
         followJobs[id] = viewModelScope.launch {
             while (true) {
                 try {
+                    var lastRefresh = 0L
                     api.deploymentEvents(apiKey, id).collect {
-                        val current = _uiState.value.deployments.firstOrNull { it.id == id }
-                        if (current?.state != DeploymentState.Building) {
+                        val now = System.currentTimeMillis()
+                        if (now - lastRefresh >= 2000) {
+                            lastRefresh = now
                             refreshStatus(apiKey, id)
                         }
                     }
@@ -199,6 +239,8 @@ class DeploymentsViewModel @Inject constructor(
                 ?: meta?.gitlabCommitMessage
                 ?: meta?.bitbucketCommitMessage
                 ?: url,
+            branch = meta?.githubCommitRef ?: meta?.gitlabCommitRef ?: meta?.bitbucketCommitRef,
+            createdAt = created,
             creators = listOfNotNull(
                 creator?.username?.let { DeploymentCreator(username = it, avatar = avatars[it]) }
             ),
