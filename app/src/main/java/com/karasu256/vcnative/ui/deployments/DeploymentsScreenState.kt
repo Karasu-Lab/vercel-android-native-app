@@ -2,6 +2,7 @@ package com.karasu256.vcnative.ui.deployments
 
 import androidx.compose.ui.graphics.ImageBitmap
 import com.karasu256.vcnative.data.model.DeploymentState
+import com.karasu256.vcnative.data.model.Project
 
 data class DeploymentCreator(
     val username: String,
@@ -24,6 +25,7 @@ data class DeploymentInfo(
 data class DeploymentsUiState(
     val deployments: List<DeploymentInfo> = emptyList(),
     val newDeployments: List<DeploymentInfo> = emptyList(),
+    val filterProject: Project? = null,
     val isLoadingMore: Boolean = false,
     val isRefreshing: Boolean = false,
     val hasMore: Boolean = true,

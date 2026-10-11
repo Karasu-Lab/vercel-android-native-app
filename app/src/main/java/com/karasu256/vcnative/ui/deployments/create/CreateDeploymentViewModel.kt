@@ -5,11 +5,14 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.karasu256.vcnative.R
 import com.karasu256.vcnative.data.model.Branch
+import com.karasu256.vcnative.data.model.Project
 import com.karasu256.vcnative.data.repository.BranchRepository
 import com.karasu256.vcnative.data.repository.DeploymentRepository
 import com.karasu256.vcnative.data.repository.GitHubAuthRepository
-import com.karasu256.vcnative.data.repository.ProjectFilterRepository
 import com.karasu256.vcnative.data.repository.ProjectRepository
+import dagger.assisted.Assisted
+import dagger.assisted.AssistedFactory
+import dagger.assisted.AssistedInject
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.channels.Channel
@@ -18,16 +21,20 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import javax.inject.Inject
 
-@HiltViewModel
-class CreateDeploymentViewModel @Inject constructor(
+@HiltViewModel(assistedFactory = CreateDeploymentViewModel.Factory::class)
+class CreateDeploymentViewModel @AssistedInject constructor(
+    @Assisted initialProject: Project?,
     private val projectRepository: ProjectRepository,
     private val branchRepository: BranchRepository,
     private val deploymentRepository: DeploymentRepository,
     private val gitHubAuthRepository: GitHubAuthRepository,
-    private val projectFilterRepository: ProjectFilterRepository,
 ) : ViewModel() {
+
+    @AssistedFactory
+    interface Factory {
+        fun create(initialProject: Project?): CreateDeploymentViewModel
+    }
 
     private val _uiState = MutableStateFlow(CreateDeploymentUiState())
     val uiState = _uiState.asStateFlow()
@@ -39,6 +46,8 @@ class CreateDeploymentViewModel @Inject constructor(
     private var commitJob: Job? = null
 
     init {
+        initialProject?.let { selectProject(ProjectItem(it)) }
+        viewModelScope.launch { projectRepository.load() }
         viewModelScope.launch {
             projectRepository.projects.collect { projects ->
                 val items = projects?.map { ProjectItem(it.project, it.avatar?.asImageBitmap()) }
@@ -60,19 +69,6 @@ class CreateDeploymentViewModel @Inject constructor(
                 if (changed) _uiState.value.selectedProject?.let { selectProject(it) }
             }
         }
-    }
-
-    fun openSheet() {
-        _uiState.update { it.copy(isSheetOpen = true, errorRes = null) }
-        viewModelScope.launch { projectRepository.load() }
-        val filter = projectFilterRepository.selected.value ?: return
-        if (_uiState.value.selectedProject?.project?.id == filter.id) return
-        val item = _uiState.value.projects?.firstOrNull { it.project.id == filter.id } ?: ProjectItem(filter)
-        selectProject(item)
-    }
-
-    fun dismissSheet() {
-        _uiState.update { it.copy(isSheetOpen = false, isProjectDialogOpen = false, isGitHubSheetOpen = false) }
     }
 
     fun openProjectDialog() {
@@ -154,7 +150,6 @@ class CreateDeploymentViewModel @Inject constructor(
             )
             if (succeeded) {
                 _events.send(CreateDeploymentEvent.Deployed)
-                _uiState.update { it.copy(isDeploying = false, selectedBranch = null, branchCommit = null) }
             } else {
                 _uiState.update { it.copy(isDeploying = false, errorRes = R.string.error_create_deployment) }
             }
