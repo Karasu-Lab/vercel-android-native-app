@@ -50,4 +50,22 @@
     <string name="error_create_deployment">Failed to create the deployment.</string>
     <string name="all_projects">All projects</string>
     <string name="clear_project_filter">Clear project filter</string>
+    <string name="swipe_rollback">Roll back</string>
+    <string name="swipe_cancel">Cancel</string>
+    <string name="swipe_delete">Delete</string>
+    <string name="confirm_rollback_title">Roll back to this deployment?</string>
+    <string name="confirm_rollback_message">Production traffic for %1$s will be pointed to this deployment.</string>
+    <string name="confirm_cancel_title">Cancel this deployment?</string>
+    <string name="confirm_cancel_message">The build for %1$s will be stopped.</string>
+    <string name="confirm_delete_title">Delete this deployment?</string>
+    <string name="confirm_delete_message">This deployment of %1$s will be permanently deleted.</string>
+    <string name="confirm">Confirm</string>
+    <string name="cancel">Cancel</string>
+    <string name="rollback_deployment_started">Rollback started.</string>
+    <string name="deployment_canceled">Deployment canceled.</string>
+    <string name="deployment_deleted">Deployment deleted.</string>
+    <string name="error_rollback_deployment">Failed to roll back the deployment.</string>
+    <string name="error_cancel_deployment">Failed to cancel the deployment.</string>
+    <string name="error_delete_deployment">Failed to delete the deployment.</string>
+    <string name="error_rollback_unavailable">Only ready production deployments can be rolled back.</string>
 </resources>

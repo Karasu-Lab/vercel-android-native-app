@@ -175,6 +175,7 @@ fun ShellScreen(
         avatar = uiState.avatar,
         onUserClick = { viewModel.showSheet(ShellSheet.User) },
         onThemeClick = { viewModel.showSheet(ShellSheet.Theme) },
+        gesturesEnabled = currentTab != ShellTab.Deployments || !drawerState.isClosed,
     ) {
         Box(
             modifier = Modifier

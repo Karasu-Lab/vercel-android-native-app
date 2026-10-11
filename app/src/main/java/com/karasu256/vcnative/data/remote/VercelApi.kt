@@ -5,6 +5,7 @@ import android.graphics.BitmapFactory
 import android.graphics.Canvas
 import com.caverock.androidsvg.SVG
 import com.karasu256.vcnative.data.model.CreateDeploymentRequestDto
+import com.karasu256.vcnative.data.model.DeleteDeploymentResponseDto
 import com.karasu256.vcnative.data.model.DeploymentDetailDto
 import com.karasu256.vcnative.data.model.DeploymentDto
 import com.karasu256.vcnative.data.model.ProjectDto
@@ -17,8 +18,10 @@ import com.karasu256.vcnative.data.model.VercelUserResponse
 import io.ktor.client.HttpClient
 import io.ktor.client.call.body
 import io.ktor.client.request.bearerAuth
+import io.ktor.client.request.delete
 import io.ktor.client.request.get
 import io.ktor.client.request.parameter
+import io.ktor.client.request.patch
 import io.ktor.client.request.post
 import io.ktor.client.request.setBody
 import io.ktor.http.ContentType
@@ -109,6 +112,16 @@ class VercelApi @Inject constructor(
             contentType(ContentType.Application.Json)
             setBody(request)
         }
+    }
+
+    suspend fun cancelDeployment(apiKey: String, id: String): DeploymentStatusDto =
+        client.patch("$BASE_URL/v12/deployments/$id/cancel") { bearerAuth(apiKey) }.body()
+
+    suspend fun deleteDeployment(apiKey: String, id: String): DeleteDeploymentResponseDto =
+        client.delete("$BASE_URL/v13/deployments/$id") { bearerAuth(apiKey) }.body()
+
+    suspend fun rollbackDeployment(apiKey: String, projectId: String, deploymentId: String) {
+        client.post("$BASE_URL/v1/projects/$projectId/rollback/$deploymentId") { bearerAuth(apiKey) }
     }
 
     suspend fun getAvatarBitmap(username: String, size: Int): Bitmap? =

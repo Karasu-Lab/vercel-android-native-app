@@ -49,4 +49,22 @@
     <string name="error_create_deployment">デプロイを作成できませんでした。</string>
     <string name="all_projects">すべてのプロジェクト</string>
     <string name="clear_project_filter">プロジェクトの絞り込みを解除</string>
+    <string name="swipe_rollback">ロールバック</string>
+    <string name="swipe_cancel">キャンセル</string>
+    <string name="swipe_delete">削除</string>
+    <string name="confirm_rollback_title">このデプロイにロールバックしますか？</string>
+    <string name="confirm_rollback_message">%1$s の本番トラフィックがこのデプロイに切り替わります。</string>
+    <string name="confirm_cancel_title">このデプロイをキャンセルしますか？</string>
+    <string name="confirm_cancel_message">%1$s のビルドが停止されます。</string>
+    <string name="confirm_delete_title">このデプロイを削除しますか？</string>
+    <string name="confirm_delete_message">%1$s のこのデプロイは完全に削除されます。</string>
+    <string name="confirm">確認</string>
+    <string name="cancel">キャンセル</string>
+    <string name="rollback_deployment_started">ロールバックを開始しました。</string>
+    <string name="deployment_canceled">デプロイをキャンセルしました。</string>
+    <string name="deployment_deleted">デプロイを削除しました。</string>
+    <string name="error_rollback_deployment">ロールバックできませんでした。</string>
+    <string name="error_cancel_deployment">デプロイをキャンセルできませんでした。</string>
+    <string name="error_delete_deployment">デプロイを削除できませんでした。</string>
+    <string name="error_rollback_unavailable">ロールバックできるのは完了済みの本番デプロイのみです。</string>
 </resources>

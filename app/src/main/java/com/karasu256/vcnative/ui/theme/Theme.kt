@@ -51,6 +51,9 @@ object NeuTheme {
 
     val chip: NeuChipStyle
         @Composable @ReadOnlyComposable get() = LocalNeuChipStyle.current
+
+    val snackbar: NeuSnackbarStyle
+        @Composable @ReadOnlyComposable get() = LocalNeuSnackbarStyle.current
 }
 
 @Composable
@@ -130,6 +133,7 @@ fun NeuTheme(
             LocalNeuFabStyle provides NeuFabStyle(),
             LocalNeuLinkButtonStyle provides NeuLinkButtonStyle(),
             LocalNeuChipStyle provides NeuChipStyle(),
+            LocalNeuSnackbarStyle provides NeuSnackbarStyle(),
             LocalNeuContentColor provides colors.onSurface,
             LocalContentColor provides colors.onSurface,
             LocalNeuTextStyle provides DefaultNeuTypography.bodyMedium,

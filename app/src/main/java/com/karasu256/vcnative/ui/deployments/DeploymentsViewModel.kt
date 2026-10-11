@@ -9,14 +9,18 @@ import com.karasu256.vcnative.data.model.DeploymentState
 import com.karasu256.vcnative.data.model.isInProgress
 import com.karasu256.vcnative.data.remote.DeploymentStatusTracker
 import com.karasu256.vcnative.data.remote.VercelApi
+import com.karasu256.vcnative.R
 import com.karasu256.vcnative.data.repository.ApiKeyRepository
+import com.karasu256.vcnative.data.repository.DeploymentRepository
 import com.karasu256.vcnative.data.repository.ProjectFilterRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.Job
+import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -27,10 +31,14 @@ class DeploymentsViewModel @Inject constructor(
     private val api: VercelApi,
     private val statusTracker: DeploymentStatusTracker,
     private val projectFilterRepository: ProjectFilterRepository,
+    private val deploymentRepository: DeploymentRepository,
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(DeploymentsUiState())
     val uiState = _uiState.asStateFlow()
+
+    private val _events = Channel<DeploymentsEvent>(Channel.BUFFERED)
+    val events = _events.receiveAsFlow()
 
     private var apiKey: String? = null
     private var nextCursor: Long? = null
@@ -158,6 +166,73 @@ class DeploymentsViewModel @Inject constructor(
         loadAvatars(deployments)
     }
 
+    fun requestAction(action: DeploymentAction) {
+        if (_uiState.value.isActionRunning) return
+        if (action is DeploymentAction.Rollback && !action.deployment.canRollback) {
+            viewModelScope.launch { _events.send(DeploymentsEvent.Message(R.string.error_rollback_unavailable)) }
+            return
+        }
+        _uiState.update { it.copy(pendingAction = action) }
+    }
+
+    fun dismissAction() {
+        if (_uiState.value.isActionRunning) return
+        _uiState.update { it.copy(pendingAction = null) }
+    }
+
+    fun confirmAction() {
+        val state = _uiState.value
+        val action = state.pendingAction ?: return
+        if (state.isActionRunning) return
+        _uiState.update { it.copy(isActionRunning = true) }
+        viewModelScope.launch {
+            val messageRes = when (action) {
+                is DeploymentAction.Rollback -> rollback(action.deployment)
+                is DeploymentAction.Cancel -> cancel(action.deployment)
+                is DeploymentAction.Delete -> delete(action.deployment)
+            }
+            _uiState.update { it.copy(pendingAction = null, isActionRunning = false) }
+            _events.send(DeploymentsEvent.Message(messageRes))
+        }
+    }
+
+    private suspend fun rollback(deployment: DeploymentInfo): Int {
+        val projectId = deployment.projectId ?: return R.string.error_rollback_deployment
+        val succeeded = deploymentRepository.rollback(projectId, deployment.id)
+        return if (succeeded) R.string.rollback_deployment_started else R.string.error_rollback_deployment
+    }
+
+    private suspend fun cancel(deployment: DeploymentInfo): Int {
+        val state = deploymentRepository.cancel(deployment.id) ?: return R.string.error_cancel_deployment
+        followJobs.remove(deployment.id)?.cancel()
+        val now = System.currentTimeMillis()
+        _uiState.update {
+            it.copy(
+                deployments = it.deployments.map { item ->
+                    if (item.id != deployment.id) return@map item
+                    item.copy(
+                        state = state,
+                        finishedAt = now,
+                        elapsedSeconds = elapsedSeconds(item.startedAt, now, state.isInProgress),
+                    )
+                }
+            )
+        }
+        return R.string.deployment_canceled
+    }
+
+    private suspend fun delete(deployment: DeploymentInfo): Int {
+        if (!deploymentRepository.delete(deployment.id)) return R.string.error_delete_deployment
+        followJobs.remove(deployment.id)?.cancel()
+        _uiState.update { state ->
+            state.copy(
+                deployments = state.deployments.filter { it.id != deployment.id },
+                newDeployments = state.newDeployments.filter { it.id != deployment.id },
+            )
+        }
+        return R.string.deployment_deleted
+    }
+
     private fun loadAvatars(deployments: List<DeploymentInfo>) {
         deployments.flatMap { it.creators }
             .map { it.username }
@@ -221,7 +296,9 @@ class DeploymentsViewModel @Inject constructor(
         val state = if (readyState != DeploymentState.Unknown) readyState else this.state
         return DeploymentInfo(
             id = uid,
+            projectId = projectId,
             projectName = name,
+            target = target,
             description = meta?.githubCommitMessage
                 ?: meta?.gitlabCommitMessage
                 ?: meta?.bitbucketCommitMessage

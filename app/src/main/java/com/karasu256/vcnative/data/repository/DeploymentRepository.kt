@@ -2,6 +2,7 @@ package com.karasu256.vcnative.data.repository
 
 import com.karasu256.vcnative.data.model.Branch
 import com.karasu256.vcnative.data.model.CreateDeploymentRequestDto
+import com.karasu256.vcnative.data.model.DeploymentState
 import com.karasu256.vcnative.data.model.GitSourceDto
 import com.karasu256.vcnative.data.model.Project
 import com.karasu256.vcnative.data.remote.VercelApi
@@ -32,6 +33,41 @@ class DeploymentRepository @Inject constructor(
                     ),
                 ),
             )
+            true
+        } catch (e: CancellationException) {
+            throw e
+        } catch (e: Exception) {
+            false
+        }
+    }
+
+    suspend fun cancel(id: String): DeploymentState? {
+        val apiKey = apiKeyRepository.read() ?: return null
+        return try {
+            api.cancelDeployment(apiKey, id).readyState
+        } catch (e: CancellationException) {
+            throw e
+        } catch (e: Exception) {
+            null
+        }
+    }
+
+    suspend fun delete(id: String): Boolean {
+        val apiKey = apiKeyRepository.read() ?: return false
+        return try {
+            api.deleteDeployment(apiKey, id)
+            true
+        } catch (e: CancellationException) {
+            throw e
+        } catch (e: Exception) {
+            false
+        }
+    }
+
+    suspend fun rollback(projectId: String, deploymentId: String): Boolean {
+        val apiKey = apiKeyRepository.read() ?: return false
+        return try {
+            api.rollbackDeployment(apiKey, projectId, deploymentId)
             true
         } catch (e: CancellationException) {
             throw e
