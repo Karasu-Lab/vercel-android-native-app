@@ -4,6 +4,9 @@ import androidx.compose.animation.ContentTransform
 import androidx.compose.animation.EnterTransition
 import androidx.compose.animation.ExitTransition
 import androidx.compose.animation.core.AnimationSpec
+import androidx.compose.animation.core.InfiniteRepeatableSpec
+import androidx.compose.animation.core.RepeatMode
+import androidx.compose.animation.core.infiniteRepeatable
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
@@ -23,6 +26,7 @@ data class NeuMotion(
     val barsSettle: AnimationSpec<Float> = tween(220),
     val noticeEnter: EnterTransition = slideInVertically(tween(220)) { -it } + fadeIn(tween(220)),
     val noticeExit: ExitTransition = slideOutVertically(tween(220)) { -it } + fadeOut(tween(220)),
+    val skeletonPulse: InfiniteRepeatableSpec<Float> = infiniteRepeatable(tween(900), RepeatMode.Reverse),
 )
 
 internal val LocalNeuMotion = staticCompositionLocalOf { NeuMotion() }

@@ -26,4 +26,18 @@
     <string name="deployment_state_canceled">Canceled</string>
     <string name="deployment_state_unknown">Unknown</string>
     <string name="new_deployment">New deployment</string>
+    <string name="deployment_detail">Deployment</string>
+    <string name="back">Back</string>
+    <string name="view_site">View site</string>
+    <string name="view_logs">View logs</string>
+    <string name="label_status">Status</string>
+    <string name="label_environment">Environment</string>
+    <string name="label_branch">Branch</string>
+    <string name="label_commit">Commit</string>
+    <string name="label_creator">Created by</string>
+    <string name="label_created_at">Created</string>
+    <string name="label_domains">Domains</string>
+    <string name="label_regions">Regions</string>
+    <string name="environment_production">Production</string>
+    <string name="environment_preview">Preview</string>
 </resources>

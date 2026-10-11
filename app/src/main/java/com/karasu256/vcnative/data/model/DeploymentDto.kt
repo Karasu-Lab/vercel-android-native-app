@@ -14,6 +14,11 @@ enum class DeploymentState {
     Unknown,
 }
 
+val DeploymentState.isInProgress: Boolean
+    get() = this == DeploymentState.Queued ||
+        this == DeploymentState.Initializing ||
+        this == DeploymentState.Building
+
 @Serializable
 data class DeploymentsResponseDto(
     val deployments: List<DeploymentDto>,
@@ -53,8 +58,33 @@ data class DeploymentMetaDto(
     val gitlabCommitMessage: String? = null,
     val bitbucketCommitMessage: String? = null,
     val githubCommitRef: String? = null,
+    val githubCommitSha: String? = null,
     val gitlabCommitRef: String? = null,
     val bitbucketCommitRef: String? = null,
+)
+
+@Serializable
+data class DeploymentDetailDto(
+    val id: String,
+    val name: String,
+    val url: String? = null,
+    val readyState: DeploymentState = DeploymentState.Unknown,
+    val target: String? = null,
+    val createdAt: Long,
+    val buildingAt: Long? = null,
+    val ready: Long? = null,
+    val alias: List<String> = emptyList(),
+    val regions: List<String> = emptyList(),
+    val creator: DeploymentCreatorDto? = null,
+    val meta: DeploymentMetaDto? = null,
+    val team: DeploymentTeamDto? = null,
+)
+
+@Serializable
+data class DeploymentTeamDto(
+    val id: String,
+    val name: String? = null,
+    val slug: String? = null,
 )
 
 @Serializable

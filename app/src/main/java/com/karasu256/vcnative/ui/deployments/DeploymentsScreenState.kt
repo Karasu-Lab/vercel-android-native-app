@@ -28,8 +28,3 @@ data class DeploymentsUiState(
     val isRefreshing: Boolean = false,
     val hasMore: Boolean = true,
 )
-
-val DeploymentState.isInProgress: Boolean
-    get() = this == DeploymentState.Queued ||
-        this == DeploymentState.Initializing ||
-        this == DeploymentState.Building

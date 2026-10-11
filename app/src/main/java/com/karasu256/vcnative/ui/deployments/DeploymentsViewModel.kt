@@ -6,6 +6,8 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.karasu256.vcnative.data.model.DeploymentDto
 import com.karasu256.vcnative.data.model.DeploymentState
+import com.karasu256.vcnative.data.model.isInProgress
+import com.karasu256.vcnative.data.remote.DeploymentStatusTracker
 import com.karasu256.vcnative.data.remote.VercelApi
 import com.karasu256.vcnative.data.repository.ApiKeyRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -22,6 +24,7 @@ import javax.inject.Inject
 class DeploymentsViewModel @Inject constructor(
     private val apiKeyRepository: ApiKeyRepository,
     private val api: VercelApi,
+    private val statusTracker: DeploymentStatusTracker,
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(DeploymentsUiState())
@@ -96,11 +99,10 @@ class DeploymentsViewModel @Inject constructor(
     }
 
     fun showNewDeployments() {
-        val key = apiKey ?: return
         val fresh = _uiState.value.newDeployments
         if (fresh.isEmpty()) return
         _uiState.update { it.copy(deployments = fresh + it.deployments, newDeployments = emptyList()) }
-        fresh.filter { it.state.isInProgress }.forEach { follow(key, it.id) }
+        fresh.filter { it.state.isInProgress }.forEach { follow(it.id) }
     }
 
     fun loadMore() {
@@ -139,7 +141,7 @@ class DeploymentsViewModel @Inject constructor(
             )
         }
 
-        deployments.filter { it.state.isInProgress }.forEach { follow(apiKey, it.id) }
+        deployments.filter { it.state.isInProgress }.forEach { follow(it.id) }
         loadAvatars(deployments)
     }
 
@@ -178,55 +180,27 @@ class DeploymentsViewModel @Inject constructor(
             }
     }
 
-    private fun follow(apiKey: String, id: String) {
+    private fun follow(id: String) {
         followJobs[id]?.cancel()
         followJobs[id] = viewModelScope.launch {
-            while (true) {
-                try {
-                    var lastRefresh = 0L
-                    api.deploymentEvents(apiKey, id).collect {
-                        val now = System.currentTimeMillis()
-                        if (now - lastRefresh >= 2000) {
-                            lastRefresh = now
-                            refreshStatus(apiKey, id)
+            statusTracker.track(id).collect { status ->
+                _uiState.update { state ->
+                    state.copy(
+                        deployments = state.deployments.map { deployment ->
+                            if (deployment.id != id) return@map deployment
+                            val startedAt = status.buildingAt ?: deployment.startedAt
+                            deployment.copy(
+                                state = status.readyState,
+                                startedAt = startedAt,
+                                finishedAt = status.ready,
+                                elapsedSeconds = elapsedSeconds(startedAt, status.ready, status.readyState.isInProgress),
+                            )
                         }
-                    }
-                } catch (e: CancellationException) {
-                    throw e
-                } catch (e: Exception) {
-                    delay(3000)
+                    )
                 }
-                val inProgress = try {
-                    refreshStatus(apiKey, id)
-                } catch (e: CancellationException) {
-                    throw e
-                } catch (e: Exception) {
-                    true
-                }
-                if (!inProgress) break
-                delay(3000)
             }
             followJobs.remove(id)
         }
-    }
-
-    private suspend fun refreshStatus(apiKey: String, id: String): Boolean {
-        val status = api.getDeploymentStatus(apiKey, id)
-        _uiState.update { state ->
-            state.copy(
-                deployments = state.deployments.map { deployment ->
-                    if (deployment.id != id) return@map deployment
-                    val startedAt = status.buildingAt ?: deployment.startedAt
-                    deployment.copy(
-                        state = status.readyState,
-                        startedAt = startedAt,
-                        finishedAt = status.ready,
-                        elapsedSeconds = elapsedSeconds(startedAt, status.ready, status.readyState.isInProgress),
-                    )
-                }
-            )
-        }
-        return status.readyState.isInProgress
     }
 
     private fun DeploymentDto.toDeploymentInfo(): DeploymentInfo {

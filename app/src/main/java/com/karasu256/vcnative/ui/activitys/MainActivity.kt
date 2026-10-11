@@ -17,6 +17,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.karasu256.vcnative.data.model.AppTheme
 import com.karasu256.vcnative.ui.components.NeuSurface
 import com.karasu256.vcnative.ui.components.NeuSurfaceStyle
+import com.karasu256.vcnative.ui.theme.NeuNavTransitions
 import com.karasu256.vcnative.ui.theme.NeuTheme
 import com.ramcosta.composedestinations.DestinationsNavHost
 import com.ramcosta.composedestinations.generated.NavGraphs
@@ -48,7 +49,10 @@ class MainActivity : ComponentActivity() {
                     shape = RectangleShape,
                     style = NeuSurfaceStyle.Flat,
                 ) {
-                    DestinationsNavHost(navGraph = NavGraphs.root)
+                    DestinationsNavHost(
+                        navGraph = NavGraphs.root,
+                        defaultTransitions = NeuNavTransitions,
+                    )
                 }
             }
         }

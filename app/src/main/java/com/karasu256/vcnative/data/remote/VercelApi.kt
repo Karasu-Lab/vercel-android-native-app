@@ -4,6 +4,7 @@ import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.graphics.Canvas
 import com.caverock.androidsvg.SVG
+import com.karasu256.vcnative.data.model.DeploymentDetailDto
 import com.karasu256.vcnative.data.model.DeploymentStatusDto
 import com.karasu256.vcnative.data.model.DeploymentsResponseDto
 import com.karasu256.vcnative.data.model.VercelEvent
@@ -45,6 +46,19 @@ class VercelApi @Inject constructor(
             until?.let { parameter("until", it) }
             since?.let { parameter("since", it) }
         }.body()
+
+    suspend fun getDeploymentDetail(apiKey: String, id: String): DeploymentDetailDto =
+        client.get("$BASE_URL/v13/deployments/$id") { bearerAuth(apiKey) }.body()
+
+    suspend fun getScreenshotBitmap(apiKey: String, deploymentId: String, teamId: String?): Bitmap? {
+        val bytes = client.get("$BASE_URL/screenshot") {
+            bearerAuth(apiKey)
+            parameter("deploymentId", deploymentId)
+            teamId?.let { parameter("teamId", it) }
+            parameter("withStatus", false)
+        }.body<ByteArray>()
+        return BitmapFactory.decodeByteArray(bytes, 0, bytes.size)
+    }
 
     suspend fun getDeploymentStatus(apiKey: String, id: String): DeploymentStatusDto =
         client.get("$BASE_URL/v13/deployments/$id") { bearerAuth(apiKey) }.body()

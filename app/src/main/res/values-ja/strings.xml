@@ -25,4 +25,18 @@
     <string name="deployment_state_canceled">キャンセル</string>
     <string name="deployment_state_unknown">不明</string>
     <string name="new_deployment">新しいデプロイ</string>
+    <string name="deployment_detail">デプロイ詳細</string>
+    <string name="back">戻る</string>
+    <string name="view_site">サイトを表示</string>
+    <string name="view_logs">ログを表示</string>
+    <string name="label_status">状態</string>
+    <string name="label_environment">環境</string>
+    <string name="label_branch">ブランチ</string>
+    <string name="label_commit">コミット</string>
+    <string name="label_creator">作成者</string>
+    <string name="label_created_at">作成日時</string>
+    <string name="label_domains">ドメイン</string>
+    <string name="label_regions">リージョン</string>
+    <string name="environment_production">本番</string>
+    <string name="environment_preview">プレビュー</string>
 </resources>
