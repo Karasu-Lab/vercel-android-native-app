@@ -31,6 +31,7 @@ fun DeploymentsList(
     onLoadMore: () -> Unit,
     onRefresh: () -> Unit,
     onDeploymentClick: (DeploymentInfo) -> Unit,
+    onDeploymentAction: (DeploymentAction) -> Unit,
     modifier: Modifier = Modifier,
     listState: LazyListState = rememberLazyListState(),
     contentPadding: PaddingValues = PaddingValues(),
@@ -58,9 +59,10 @@ fun DeploymentsList(
             contentPadding = contentPadding,
         ) {
             items(items = deployments, key = { it.id }) { deployment ->
-                DeploymentInfoListTile(
+                SwipeableDeploymentListTile(
                     deployment = deployment,
                     onClick = { onDeploymentClick(deployment) },
+                    onAction = onDeploymentAction,
                 )
             }
             if (isLoadingMore) {

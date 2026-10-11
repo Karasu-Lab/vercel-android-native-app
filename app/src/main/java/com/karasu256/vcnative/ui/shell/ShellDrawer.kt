@@ -72,6 +72,7 @@ fun ShellDrawer(
     onUserClick: () -> Unit,
     onThemeClick: () -> Unit,
     modifier: Modifier = Modifier,
+    gesturesEnabled: Boolean = true,
     content: @Composable () -> Unit,
 ) {
     val scope = rememberCoroutineScope()
@@ -90,6 +91,7 @@ fun ShellDrawer(
     ModalNavigationDrawer(
         drawerState = drawerState,
         modifier = modifier,
+        gesturesEnabled = gesturesEnabled,
         drawerContent = {
             BoxWithConstraints {
                 val fullWidthPx = constraints.maxWidth

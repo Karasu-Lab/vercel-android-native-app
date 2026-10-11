@@ -37,6 +37,8 @@ data class DeploymentDto(
     val uid: String,
     val name: String,
     val url: String? = null,
+    val projectId: String? = null,
+    val target: String? = null,
     val created: Long,
     val state: DeploymentState = DeploymentState.Unknown,
     val readyState: DeploymentState = DeploymentState.Unknown,
@@ -97,4 +99,10 @@ data class DeploymentStatusDto(
     val createdAt: Long? = null,
     val buildingAt: Long? = null,
     val ready: Long? = null,
+)
+
+@Serializable
+data class DeleteDeploymentResponseDto(
+    val uid: String,
+    val state: String,
 )

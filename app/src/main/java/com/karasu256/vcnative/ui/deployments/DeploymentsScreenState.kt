@@ -1,7 +1,9 @@
 package com.karasu256.vcnative.ui.deployments
 
+import androidx.annotation.StringRes
 import androidx.compose.ui.graphics.ImageBitmap
 import com.karasu256.vcnative.data.model.DeploymentState
+import com.karasu256.vcnative.data.model.isInProgress
 import com.karasu256.vcnative.data.model.Project
 
 data class DeploymentCreator(
@@ -11,7 +13,9 @@ data class DeploymentCreator(
 
 data class DeploymentInfo(
     val id: String,
+    val projectId: String?,
     val projectName: String,
+    val target: String?,
     val description: String?,
     val branch: String?,
     val createdAt: Long,
@@ -20,7 +24,23 @@ data class DeploymentInfo(
     val startedAt: Long,
     val finishedAt: Long?,
     val elapsedSeconds: Long?,
-)
+) {
+    val canRollback: Boolean
+        get() = projectId != null && target == "production" && state == DeploymentState.Ready
+}
+
+sealed interface DeploymentAction {
+    val deployment: DeploymentInfo
+
+    data class Rollback(override val deployment: DeploymentInfo) : DeploymentAction
+
+    data class Cancel(override val deployment: DeploymentInfo) : DeploymentAction
+
+    data class Delete(override val deployment: DeploymentInfo) : DeploymentAction
+}
+
+fun DeploymentInfo.endToStartAction(): DeploymentAction =
+    if (state.isInProgress) DeploymentAction.Cancel(this) else DeploymentAction.Delete(this)
 
 data class DeploymentsUiState(
     val deployments: List<DeploymentInfo> = emptyList(),
@@ -29,4 +49,10 @@ data class DeploymentsUiState(
     val isLoadingMore: Boolean = false,
     val isRefreshing: Boolean = false,
     val hasMore: Boolean = true,
+    val pendingAction: DeploymentAction? = null,
+    val isActionRunning: Boolean = false,
 )
+
+sealed interface DeploymentsEvent {
+    data class Message(@StringRes val messageRes: Int) : DeploymentsEvent
+}
