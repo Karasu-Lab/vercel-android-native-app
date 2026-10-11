@@ -11,4 +11,10 @@
     <string name="settings">設定</string>
     <string name="open_menu">メニューを開く</string>
     <string name="close_menu">メニューを閉じる</string>
+    <string name="menu">メニュー</string>
+    <string name="user">ユーザー</string>
+    <string name="theme">テーマ</string>
+    <string name="theme_system">システムに従う</string>
+    <string name="theme_light">ライト</string>
+    <string name="theme_dark">ダーク</string>
 </resources>

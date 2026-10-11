@@ -9,3 +9,4 @@
 - When reporting work, describe only what was changed. Do not add unsolicited suggestions or mention commit status.
 - Do not ask the user for screenshots.
 - Do not reply with questions. Make a decision and act on it.
+- Do not mention whether the project was built, e.g. "not built yet".
