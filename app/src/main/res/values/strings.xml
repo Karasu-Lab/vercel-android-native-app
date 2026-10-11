@@ -18,4 +18,11 @@
     <string name="theme_system">Follow system</string>
     <string name="theme_light">Light</string>
     <string name="theme_dark">Dark</string>
+    <string name="deployment_state_queued">Queued</string>
+    <string name="deployment_state_initializing">Initializing</string>
+    <string name="deployment_state_building">Building</string>
+    <string name="deployment_state_error">Error</string>
+    <string name="deployment_state_ready">Ready</string>
+    <string name="deployment_state_canceled">Canceled</string>
+    <string name="deployment_state_unknown">Unknown</string>
 </resources>

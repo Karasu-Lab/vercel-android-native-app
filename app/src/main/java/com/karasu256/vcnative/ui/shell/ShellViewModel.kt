@@ -1,12 +1,8 @@
 package com.karasu256.vcnative.ui.shell
 
-import android.graphics.Bitmap
-import android.graphics.BitmapFactory
-import android.graphics.Canvas
 import androidx.compose.ui.graphics.asImageBitmap
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.caverock.androidsvg.SVG
 import com.karasu256.vcnative.data.remote.VercelApi
 import com.karasu256.vcnative.data.repository.ApiKeyRepository
 import com.karasu256.vcnative.data.repository.UserRepository
@@ -36,15 +32,7 @@ class ShellViewModel @Inject constructor(
         viewModelScope.launch {
             val user = runCatching { userRepository.restore() }.getOrNull() ?: return@launch
             _uiState.update { it.copy(user = user) }
-            val avatar = runCatching { api.getAvatar(user.username, AVATAR_SIZE) }.getOrNull()
-                ?.let { bytes ->
-                    BitmapFactory.decodeByteArray(bytes, 0, bytes.size) ?: runCatching {
-                        val svg = SVG.getFromString(bytes.decodeToString())
-                        Bitmap.createBitmap(AVATAR_SIZE, AVATAR_SIZE, Bitmap.Config.ARGB_8888).also {
-                            svg.renderToCanvas(Canvas(it))
-                        }
-                    }.getOrNull()
-                }
+            val avatar = runCatching { api.getAvatarBitmap(user.username, AVATAR_SIZE) }.getOrNull()
                 ?.asImageBitmap()
             _uiState.update { it.copy(avatar = avatar) }
         }

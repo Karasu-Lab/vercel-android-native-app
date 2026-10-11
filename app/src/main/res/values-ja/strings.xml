@@ -17,4 +17,11 @@
     <string name="theme_system">システムに従う</string>
     <string name="theme_light">ライト</string>
     <string name="theme_dark">ダーク</string>
+    <string name="deployment_state_queued">待機中</string>
+    <string name="deployment_state_initializing">初期化中</string>
+    <string name="deployment_state_building">ビルド中</string>
+    <string name="deployment_state_error">ビルド失敗</string>
+    <string name="deployment_state_ready">ビルド成功</string>
+    <string name="deployment_state_canceled">キャンセル</string>
+    <string name="deployment_state_unknown">不明</string>
 </resources>

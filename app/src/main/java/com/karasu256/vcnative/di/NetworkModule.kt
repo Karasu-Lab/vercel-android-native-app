@@ -21,6 +21,7 @@ object NetworkModule {
     fun provideJson(): Json = Json {
         ignoreUnknownKeys = true
         explicitNulls = false
+        coerceInputValues = true
     }
 
     @Provides
