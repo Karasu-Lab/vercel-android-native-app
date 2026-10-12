@@ -8,12 +8,11 @@ import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.karasu256.vcnative.ui.logs.ProjectList
 import com.karasu256.vcnative.ui.logs.ProjectListViewModel
-import com.karasu256.vcnative.ui.theme.NeuFadeTransitions
 import com.ramcosta.composedestinations.annotation.Destination
 import com.ramcosta.composedestinations.generated.destinations.ProjectEnvironmentVariablesScreenDestination
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
 
-@Destination<EnvironmentShellGraph>(start = true, style = NeuFadeTransitions::class)
+@Destination<EnvironmentShellGraph>(start = true)
 @Composable
 fun EnvironmentProjectsScreen(
     navigator: DestinationsNavigator,
