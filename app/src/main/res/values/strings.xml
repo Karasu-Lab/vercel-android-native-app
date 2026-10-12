@@ -88,4 +88,22 @@
     <string name="confirm_delete_app_data_message">Your API key, settings and cached data will be deleted, and you will be logged out.</string>
     <string name="network_logging_enable">Enable network logging</string>
     <string name="network_logging_description">Write Ktor requests to Logcat.</string>
+    <string name="drawer_section_application">Application</string>
+    <string name="deployment_list">Deployment list</string>
+    <string name="app_logs">App logs</string>
+    <string name="production_deployment">Production</string>
+    <string name="latest_deployment">Latest</string>
+    <string name="past_deployments">Past</string>
+    <string name="no_deployments">No deployments yet.</string>
+    <string name="no_projects">No projects found.</string>
+    <string name="no_logs">No logs yet.</string>
+    <string name="error_load_logs">Failed to load logs.</string>
+    <string name="log_no_output">(no output)</string>
+    <string name="log_output">Output</string>
+    <string name="label_time">Time</string>
+    <string name="label_level">Level</string>
+    <string name="label_source">Source</string>
+    <string name="label_domain">Domain</string>
+    <string name="copy_output">Copy output</string>
+    <string name="copied">Copied</string>
 </resources>

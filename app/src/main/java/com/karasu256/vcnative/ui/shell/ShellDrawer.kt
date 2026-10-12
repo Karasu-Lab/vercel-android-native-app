@@ -2,6 +2,7 @@ package com.karasu256.vcnative.ui.shell
 
 import androidx.compose.animation.core.Animatable
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.gestures.awaitEachGesture
 import androidx.compose.foundation.gestures.awaitFirstDown
 import androidx.compose.foundation.gestures.awaitHorizontalTouchSlopOrCancellation
@@ -29,8 +30,12 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AccountCircle
 import androidx.compose.material.icons.filled.Brightness6
 import androidx.compose.material.icons.filled.Close
+import androidx.compose.material.icons.filled.Description
+import androidx.compose.material.icons.filled.RocketLaunch
 import androidx.compose.material3.DrawerState
 import androidx.compose.material3.Icon
+import androidx.compose.material3.ListItem
+import androidx.compose.material3.ListItemDefaults
 import androidx.compose.material3.ModalNavigationDrawer
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -41,7 +46,9 @@ import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ImageBitmap
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.input.pointer.positionChange
 import androidx.compose.ui.input.pointer.util.VelocityTracker
@@ -55,6 +62,7 @@ import com.karasu256.vcnative.R
 import com.karasu256.vcnative.ui.theme.BarSurface
 import com.karasu256.vcnative.ui.theme.DrawerSurface
 import com.karasu256.vcnative.ui.theme.NeuTheme
+import com.karasu256.vcnative.ui.theme.SectionHeader
 import com.karasu256.vcnative.ui.theme.ToolbarButton
 import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.launch
@@ -68,6 +76,8 @@ fun ShellDrawer(
     avatar: ImageBitmap?,
     onUserClick: () -> Unit,
     onThemeClick: () -> Unit,
+    onDeploymentsClick: () -> Unit,
+    onLogsClick: () -> Unit,
     modifier: Modifier = Modifier,
     gesturesEnabled: Boolean = true,
     content: @Composable () -> Unit,
@@ -160,6 +170,17 @@ fun ShellDrawer(
                                 )
                             }
                         }
+                        SectionHeader(title = stringResource(R.string.drawer_section_application))
+                        DrawerItem(
+                            icon = Icons.Default.RocketLaunch,
+                            label = stringResource(R.string.deployment_list),
+                            onClick = onDeploymentsClick,
+                        )
+                        DrawerItem(
+                            icon = Icons.Default.Description,
+                            label = stringResource(R.string.app_logs),
+                            onClick = onLogsClick,
+                        )
                         Spacer(Modifier.weight(1f))
                         BarSurface(modifier = Modifier.fillMaxWidth()) {
                             Row(
@@ -188,6 +209,20 @@ fun ShellDrawer(
             }
         },
         content = content,
+    )
+}
+
+@Composable
+private fun DrawerItem(
+    icon: ImageVector,
+    label: String,
+    onClick: () -> Unit,
+) {
+    ListItem(
+        headlineContent = { Text(text = label, maxLines = 1) },
+        modifier = Modifier.clickable(onClick = onClick),
+        leadingContent = { Icon(imageVector = icon, contentDescription = null) },
+        colors = ListItemDefaults.colors(containerColor = Color.Transparent),
     )
 }
 

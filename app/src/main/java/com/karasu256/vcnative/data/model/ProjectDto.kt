@@ -12,6 +12,7 @@ data class ProjectsResponseDto(
 data class ProjectDto(
     val id: String,
     val name: String,
+    val accountId: String? = null,
     val avatar: String? = null,
     val link: ProjectLinkDto? = null,
 )

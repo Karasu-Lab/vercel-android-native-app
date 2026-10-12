@@ -12,6 +12,8 @@ import com.karasu256.vcnative.data.model.ProjectDto
 import com.karasu256.vcnative.data.model.ProjectsResponseDto
 import com.karasu256.vcnative.data.model.DeploymentStatusDto
 import com.karasu256.vcnative.data.model.DeploymentsResponseDto
+import com.karasu256.vcnative.data.model.RequestLogsResponseDto
+import com.karasu256.vcnative.data.model.RuntimeLogDto
 import com.karasu256.vcnative.data.model.VercelEvent
 import com.karasu256.vcnative.data.model.VercelUser
 import com.karasu256.vcnative.data.model.VercelUserResponse
@@ -93,6 +95,44 @@ class VercelApi @Inject constructor(
         }
     }
 
+    fun runtimeLogs(apiKey: String, projectId: String, deploymentId: String): Flow<RuntimeLogDto> = flow {
+        client.prepareGet("$BASE_URL/v1/projects/$projectId/deployments/$deploymentId/runtime-logs") {
+            bearerAuth(apiKey)
+            parameter("format", "lines")
+        }.execute { response ->
+            val channel = response.bodyAsChannel()
+            while (true) {
+                val line = channel.readLine() ?: break
+                if (line.isBlank()) continue
+                runCatching { json.decodeFromString<RuntimeLogDto>(line) }
+                    .getOrNull()
+                    ?.let { emit(it) }
+            }
+        }
+    }
+
+    suspend fun getRequestLogs(
+        apiKey: String,
+        projectId: String,
+        ownerId: String,
+        deploymentId: String,
+        page: Int,
+        startDate: Long,
+        endDate: Long,
+    ): RequestLogsResponseDto =
+        client.get("$WEB_URL/api/logs/request-logs") {
+            bearerAuth(apiKey)
+            parameter("projectId", projectId)
+            parameter("ownerId", ownerId)
+            parameter("deploymentId", deploymentId)
+            parameter("page", page)
+            parameter("startDate", startDate)
+            parameter("endDate", endDate)
+        }.body()
+
+    suspend fun getProject(apiKey: String, projectId: String): ProjectDto =
+        client.get("$BASE_URL/v9/projects/$projectId") { bearerAuth(apiKey) }.body()
+
     suspend fun getProjects(apiKey: String): List<ProjectDto> =
         client.get("$BASE_URL/v10/projects") {
             bearerAuth(apiKey)
@@ -150,6 +190,7 @@ class VercelApi @Inject constructor(
 
     companion object {
         const val BASE_URL = "https://api.vercel.com"
+        const val WEB_URL = "https://vercel.com"
         const val AVATAR_URL = "https://api.vercel.com/www/avatar"
     }
 }

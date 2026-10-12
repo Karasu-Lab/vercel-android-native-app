@@ -10,8 +10,6 @@ import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material3.CircularProgressIndicator
-import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.pulltorefresh.PullToRefreshBox
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.derivedStateOf
@@ -20,16 +18,17 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import com.karasu256.vcnative.ui.components.RefreshBox
+import com.karasu256.vcnative.ui.components.Refreshable
 import com.karasu256.vcnative.ui.theme.NeuTheme
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun DeploymentsList(
     deployments: List<DeploymentInfo>,
     isLoadingMore: Boolean,
     isRefreshing: Boolean,
     onLoadMore: () -> Unit,
-    onRefresh: () -> Unit,
+    refreshable: Refreshable,
     onDeploymentClick: (DeploymentInfo) -> Unit,
     onDeploymentAction: (DeploymentAction) -> Unit,
     modifier: Modifier = Modifier,
@@ -48,9 +47,9 @@ fun DeploymentsList(
         if (reachedEnd) currentOnLoadMore()
     }
 
-    PullToRefreshBox(
+    RefreshBox(
+        refreshable = refreshable,
         isRefreshing = isRefreshing,
-        onRefresh = onRefresh,
         modifier = modifier,
     ) {
         LazyColumn(
