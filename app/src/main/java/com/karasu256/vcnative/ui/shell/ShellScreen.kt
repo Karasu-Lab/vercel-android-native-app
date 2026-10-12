@@ -4,11 +4,9 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.LocalActivity
 import androidx.annotation.StringRes
 import androidx.compose.animation.core.animate
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.WindowInsetsSides
@@ -18,7 +16,6 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.only
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.systemBars
 import androidx.compose.foundation.layout.union
 import androidx.compose.foundation.layout.windowInsetsPadding
@@ -26,6 +23,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.RocketLaunch
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material3.DrawerValue
+import androidx.compose.material3.Icon
 import androidx.compose.material3.rememberDrawerState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
@@ -41,7 +39,6 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
-import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.input.nestedscroll.NestedScrollConnection
 import androidx.compose.ui.input.nestedscroll.NestedScrollSource
@@ -50,19 +47,16 @@ import androidx.compose.ui.layout.onSizeChanged
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.Velocity
-import androidx.compose.ui.unit.dp
 import androidx.compose.ui.zIndex
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.compose.rememberNavController
 import com.karasu256.vcnative.R
 import com.karasu256.vcnative.ui.activitys.AppThemeViewModel
-import com.karasu256.vcnative.ui.components.NeuButton
-import com.karasu256.vcnative.ui.components.NeuButtonVariant
-import com.karasu256.vcnative.ui.components.NeuSurface
 import com.karasu256.vcnative.ui.deployments.create.ProjectSelectDialog
-import com.karasu256.vcnative.ui.theme.LocalNeuContentColor
+import com.karasu256.vcnative.ui.theme.BarSurface
 import com.karasu256.vcnative.ui.theme.NeuTheme
+import com.karasu256.vcnative.ui.theme.TabButton
 import com.ramcosta.composedestinations.DestinationsNavHost
 import com.ramcosta.composedestinations.annotation.Destination
 import com.ramcosta.composedestinations.annotation.RootGraph
@@ -216,14 +210,12 @@ fun ShellScreen(
                     )
                 }
             }
-            NeuSurface(
+            BarSurface(
                 modifier = Modifier
                     .fillMaxWidth()
                     .align(Alignment.BottomCenter)
                     .onSizeChanged { bottomBarHeight = it.height }
                     .offset { IntOffset(0, (bottomBarHeight * barsCollapse).roundToInt()) },
-                shape = NeuTheme.bar.shape,
-                depth = NeuTheme.bar.depth,
             ) {
                 Row(
                     modifier = Modifier
@@ -233,7 +225,8 @@ fun ShellScreen(
                     verticalAlignment = Alignment.CenterVertically,
                 ) {
                     ShellTab.entries.forEach { tab ->
-                        NeuButton(
+                        TabButton(
+                            selected = tab == currentTab,
                             onClick = {
                                 tabNavigator.navigate(tab.destination) {
                                     popUpTo(NavGraphs.shell) { saveState = true }
@@ -241,14 +234,10 @@ fun ShellScreen(
                                     restoreState = true
                                 }
                             },
-                            modifier = Modifier.size(48.dp),
-                            variant = if (tab == currentTab) NeuButtonVariant.Primary else NeuButtonVariant.Neutral,
-                            contentPadding = PaddingValues(0.dp),
                         ) {
-                            Image(
+                            Icon(
                                 imageVector = tab.icon,
                                 contentDescription = stringResource(tab.labelRes),
-                                colorFilter = ColorFilter.tint(LocalNeuContentColor.current),
                             )
                         }
                     }

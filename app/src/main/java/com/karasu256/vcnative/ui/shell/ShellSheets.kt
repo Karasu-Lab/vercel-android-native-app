@@ -23,9 +23,8 @@ import androidx.compose.ui.unit.dp
 import com.karasu256.vcnative.R
 import com.karasu256.vcnative.data.model.AppTheme
 import com.karasu256.vcnative.data.model.VercelUser
-import com.karasu256.vcnative.ui.components.NeuButton
-import com.karasu256.vcnative.ui.components.NeuText
 import com.karasu256.vcnative.ui.theme.NeuTheme
+import com.karasu256.vcnative.ui.theme.PrimaryButton
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -43,13 +42,13 @@ fun UserSheet(
             supportingContent = user?.email?.let { email -> { Text(text = email) } },
             leadingContent = { UserAvatar(avatar = avatar, size = 40.dp) },
         )
-        NeuButton(
+        PrimaryButton(
             onClick = onLogout,
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(horizontal = spacing.lg, vertical = spacing.lg),
         ) {
-            NeuText(text = stringResource(R.string.logout))
+            Text(text = stringResource(R.string.logout))
         }
     }
 }

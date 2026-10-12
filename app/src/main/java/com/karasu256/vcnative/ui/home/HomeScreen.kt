@@ -19,9 +19,9 @@ import androidx.compose.ui.res.stringResource
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.karasu256.vcnative.R
-import com.karasu256.vcnative.ui.components.NeuButton
-import com.karasu256.vcnative.ui.components.NeuText
+import androidx.compose.material3.Text
 import com.karasu256.vcnative.ui.theme.NeuTheme
+import com.karasu256.vcnative.ui.theme.PrimaryButton
 import com.ramcosta.composedestinations.annotation.Destination
 import com.ramcosta.composedestinations.annotation.RootGraph
 import com.ramcosta.composedestinations.generated.destinations.HomeScreenDestination
@@ -55,13 +55,13 @@ fun HomeScreen(
     ) {
         val state = uiState
         if (state is HomeUiState.Ready) {
-            NeuText(
+            Text(
                 text = state.username,
                 style = NeuTheme.typography.headline,
             )
             Spacer(Modifier.height(NeuTheme.spacing.xl))
-            NeuButton(onClick = viewModel::logout) {
-                NeuText(text = stringResource(R.string.logout))
+            PrimaryButton(onClick = viewModel::logout) {
+                Text(text = stringResource(R.string.logout))
             }
         }
     }

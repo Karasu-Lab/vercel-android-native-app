@@ -10,6 +10,7 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material3.Icon
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -19,7 +20,6 @@ import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import com.karasu256.vcnative.R
-import com.karasu256.vcnative.ui.components.NeuText
 import com.karasu256.vcnative.ui.deployments.create.ProjectIcon
 import com.karasu256.vcnative.ui.deployments.create.ProjectItem
 import com.karasu256.vcnative.ui.theme.NeuTheme
@@ -57,7 +57,7 @@ fun ShellProjectFilter(
                     modifier = Modifier.size(24.dp),
                 )
             }
-            NeuText(
+            Text(
                 text = project?.project?.name ?: stringResource(R.string.all_projects),
                 modifier = Modifier.widthIn(max = 160.dp),
                 maxLines = 1,

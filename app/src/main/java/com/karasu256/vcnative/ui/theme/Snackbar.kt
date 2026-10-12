@@ -9,7 +9,11 @@ import androidx.compose.animation.slideInVertically
 import androidx.compose.animation.slideOutVertically
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.SnackbarHostState
+import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Immutable
+import androidx.compose.ui.Modifier
+import com.karasu256.vcnative.ui.components.NeuSnackbarHost
 import androidx.compose.runtime.staticCompositionLocalOf
 import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.unit.dp
@@ -26,3 +30,11 @@ data class NeuSnackbarStyle(
 )
 
 internal val LocalNeuSnackbarStyle = staticCompositionLocalOf { NeuSnackbarStyle() }
+
+@Composable
+fun FloatingSnackbarHost(
+    hostState: SnackbarHostState,
+    modifier: Modifier = Modifier,
+) {
+    NeuSnackbarHost(hostState = hostState, modifier = modifier)
+}

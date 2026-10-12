@@ -6,7 +6,6 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
@@ -33,12 +32,11 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.karasu256.vcnative.R
 import com.karasu256.vcnative.data.model.Project
 import com.karasu256.vcnative.ui.deployments.create.CreateDeploymentHost
-import com.karasu256.vcnative.ui.components.NeuButton
-import com.karasu256.vcnative.ui.components.NeuSnackbarHost
 import com.karasu256.vcnative.ui.shell.LocalShellBars
-import com.karasu256.vcnative.ui.theme.LocalNeuContentColor
 import com.karasu256.vcnative.ui.shell.RootNavigator
 import com.karasu256.vcnative.ui.shell.ShellGraph
+import com.karasu256.vcnative.ui.theme.ActionFab
+import com.karasu256.vcnative.ui.theme.FloatingSnackbarHost
 import com.karasu256.vcnative.ui.theme.NeuTheme
 import com.ramcosta.composedestinations.annotation.Destination
 import com.ramcosta.composedestinations.generated.destinations.DeploymentDetailScreenDestination
@@ -120,17 +118,13 @@ fun DeploymentsScreen(
                     scope.launch { listState.animateScrollToItem(0) }
                 },
             )
-            NeuSnackbarHost(hostState = snackbarHostState)
+            FloatingSnackbarHost(hostState = snackbarHostState)
         }
-        NeuButton(
+        ActionFab(
             onClick = { createSession = CreateDeploymentSession(uiState.filterProject) },
-            contentPadding = NeuTheme.fab.contentPadding,
-            shape = NeuTheme.fab.shape,
-            depth = NeuTheme.fab.depth,
             modifier = Modifier
                 .align(Alignment.BottomEnd)
                 .padding(end = NeuTheme.spacing.lg, bottom = NeuTheme.spacing.lg)
-                .size(NeuTheme.fab.size)
                 .onSizeChanged { fabHeight = it.height }
                 .offset {
                     val shown = -bars.bottomBarHeight * (1f - bars.collapseFraction)
@@ -141,7 +135,6 @@ fun DeploymentsScreen(
             Icon(
                 imageVector = Icons.Default.Add,
                 contentDescription = stringResource(R.string.create_deployment),
-                tint = LocalNeuContentColor.current,
             )
         }
     }

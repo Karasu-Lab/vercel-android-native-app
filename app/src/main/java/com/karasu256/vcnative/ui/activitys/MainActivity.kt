@@ -13,13 +13,11 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.RectangleShape
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.lifecycleScope
 import com.karasu256.vcnative.data.repository.GitHubAuthRepository
 import com.karasu256.vcnative.data.model.AppTheme
-import com.karasu256.vcnative.ui.components.NeuSurface
-import com.karasu256.vcnative.ui.components.NeuSurfaceStyle
+import com.karasu256.vcnative.ui.theme.AppBackground
 import com.karasu256.vcnative.ui.theme.NeuNavTransitions
 import com.karasu256.vcnative.ui.theme.NeuTheme
 import com.ramcosta.composedestinations.DestinationsNavHost
@@ -53,11 +51,7 @@ class MainActivity : ComponentActivity() {
             }
 
             NeuTheme(darkTheme = darkTheme) {
-                NeuSurface(
-                    modifier = Modifier.fillMaxSize(),
-                    shape = RectangleShape,
-                    style = NeuSurfaceStyle.Flat,
-                ) {
+                AppBackground(modifier = Modifier.fillMaxSize()) {
                     DestinationsNavHost(
                         navGraph = NavGraphs.root,
                         defaultTransitions = NeuNavTransitions,

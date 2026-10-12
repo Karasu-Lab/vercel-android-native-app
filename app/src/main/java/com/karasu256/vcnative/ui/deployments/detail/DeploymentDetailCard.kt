@@ -12,9 +12,9 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.karasu256.vcnative.R
-import com.karasu256.vcnative.ui.components.NeuCard
-import com.karasu256.vcnative.ui.components.NeuSkeleton
-import com.karasu256.vcnative.ui.components.NeuText
+import com.karasu256.vcnative.ui.theme.ContentCard
+import com.karasu256.vcnative.ui.theme.Skeleton
+import androidx.compose.material3.Text
 import com.karasu256.vcnative.ui.deployments.DeploymentStateIndicator
 import com.karasu256.vcnative.ui.deployments.formatElapsed
 import com.karasu256.vcnative.ui.deployments.labelRes
@@ -28,16 +28,16 @@ fun DeploymentDetailCard(
     detail: DeploymentDetail?,
     modifier: Modifier = Modifier,
 ) {
-    NeuCard(modifier = modifier.fillMaxWidth()) {
+    ContentCard(modifier = modifier.fillMaxWidth()) {
         if (detail == null) {
             repeat(6) {
-                NeuSkeleton(
+                Skeleton(
                     modifier = Modifier
                         .fillMaxWidth()
                         .height(20.dp)
                 )
             }
-            return@NeuCard
+            return@ContentCard
         }
 
         DetailRow(label = R.string.label_status) {
@@ -46,9 +46,9 @@ fun DeploymentDetailCard(
                 verticalAlignment = Alignment.CenterVertically,
             ) {
                 DeploymentStateIndicator(state = detail.state)
-                NeuText(text = stringResource(detail.state.labelRes))
+                Text(text = stringResource(detail.state.labelRes))
                 detail.elapsedSeconds?.let { seconds ->
-                    NeuText(
+                    Text(
                         text = formatElapsed(seconds),
                         color = NeuTheme.colors.onSurfaceMuted,
                     )
@@ -57,7 +57,7 @@ fun DeploymentDetailCard(
         }
         detail.target?.let { target ->
             DetailRow(label = R.string.label_environment) {
-                NeuText(
+                Text(
                     text = stringResource(
                         if (target == "production") R.string.environment_production else R.string.environment_preview
                     )
@@ -65,14 +65,14 @@ fun DeploymentDetailCard(
             }
         }
         detail.branch?.let { branch ->
-            DetailRow(label = R.string.label_branch) { NeuText(text = branch) }
+            DetailRow(label = R.string.label_branch) { Text(text = branch) }
         }
         detail.commitMessage?.let { message ->
             DetailRow(label = R.string.label_commit) {
                 Column {
-                    NeuText(text = message)
+                    Text(text = message)
                     detail.commitSha?.let { sha ->
-                        NeuText(text = sha, color = NeuTheme.colors.onSurfaceMuted)
+                        Text(text = sha, color = NeuTheme.colors.onSurfaceMuted)
                     }
                 }
             }
@@ -84,12 +84,12 @@ fun DeploymentDetailCard(
                     verticalAlignment = Alignment.CenterVertically,
                 ) {
                     UserAvatar(avatar = creator.avatar, size = 24.dp)
-                    NeuText(text = creator.username)
+                    Text(text = creator.username)
                 }
             }
         }
         DetailRow(label = R.string.label_created_at) {
-            NeuText(
+            Text(
                 text = DateFormat.getDateTimeInstance(DateFormat.MEDIUM, DateFormat.SHORT)
                     .format(Date(detail.createdAt))
             )
@@ -97,13 +97,13 @@ fun DeploymentDetailCard(
         if (detail.domains.isNotEmpty()) {
             DetailRow(label = R.string.label_domains) {
                 Column {
-                    detail.domains.forEach { domain -> NeuText(text = domain) }
+                    detail.domains.forEach { domain -> Text(text = domain) }
                 }
             }
         }
         if (detail.regions.isNotEmpty()) {
             DetailRow(label = R.string.label_regions) {
-                NeuText(text = detail.regions.joinToString())
+                Text(text = detail.regions.joinToString())
             }
         }
     }
@@ -115,7 +115,7 @@ private fun DetailRow(
     content: @Composable () -> Unit,
 ) {
     Column(verticalArrangement = Arrangement.spacedBy(NeuTheme.spacing.xs)) {
-        NeuText(
+        Text(
             text = stringResource(label),
             style = NeuTheme.typography.labelCaps,
             color = NeuTheme.colors.onSurfaceMuted,
