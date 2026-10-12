@@ -11,6 +11,7 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
+import kotlinx.serialization.json.longOrNull
 import javax.inject.Inject
 import javax.inject.Singleton
 
@@ -27,23 +28,16 @@ class ProjectRepository @Inject constructor(
     suspend fun load(force: Boolean = false) = mutex.withLock {
         if (!force && _projects.value != null) return@withLock
         val apiKey = apiKeyRepository.read() ?: return@withLock
-        val projects = try {
-            api.getProjects(apiKey).map { project ->
-                Project(
-                    id = project.id,
-                    name = project.name,
-                    avatarHash = project.avatar,
-                    repoId = project.link?.repoId,
-                    org = project.link?.org,
-                    repo = project.link?.repo,
-                    productionBranch = project.link?.productionBranch,
-                )
-            }
-        } catch (e: CancellationException) {
-            throw e
-        } catch (e: Exception) {
-            if (_projects.value != null) return@withLock
-            emptyList()
+        val projects = api.getProjects(apiKey).map { project ->
+            Project(
+                id = project.id,
+                name = project.name,
+                avatarHash = project.avatar,
+                repoId = project.link?.repoId?.longOrNull,
+                org = project.link?.org,
+                repo = project.link?.repo,
+                productionBranch = project.link?.productionBranch,
+            )
         }
         val loadedAvatars = _projects.value.orEmpty().associate { it.project.id to it.avatar }
         _projects.value = projects.map { ProjectWithAvatar(it, loadedAvatars[it.id]) }

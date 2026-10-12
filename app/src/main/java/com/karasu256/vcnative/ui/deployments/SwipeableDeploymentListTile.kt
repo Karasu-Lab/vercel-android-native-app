@@ -4,18 +4,25 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Block
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.History
-import androidx.compose.material3.SwipeToDismissBox
-import androidx.compose.material3.SwipeToDismissBoxValue
-import androidx.compose.material3.rememberSwipeToDismissBoxState
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.ui.Alignment
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.stringResource
 import com.karasu256.vcnative.R
+import com.karasu256.vcnative.ui.components.ListItemSwipeAction
+import com.karasu256.vcnative.ui.components.SwipeDirection
+import com.karasu256.vcnative.ui.components.SwipeableListItem
+import com.karasu256.vcnative.ui.components.alignment
 import com.karasu256.vcnative.ui.theme.SwipeActionBackground
-import kotlinx.coroutines.launch
+
+private class DeploymentSwipeAction(
+    val action: DeploymentAction,
+    direction: SwipeDirection,
+    private val onAction: (DeploymentAction) -> Unit,
+) : ListItemSwipeAction(direction) {
+    override fun execute() = onAction(action)
+}
 
 @Composable
 fun SwipeableDeploymentListTile(
@@ -24,49 +31,27 @@ fun SwipeableDeploymentListTile(
     onAction: (DeploymentAction) -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    val state = rememberSwipeToDismissBoxState()
-    val scope = rememberCoroutineScope()
+    val actions = remember(deployment, onAction) {
+        listOf(
+            DeploymentSwipeAction(DeploymentAction.Rollback(deployment), SwipeDirection.LeftToRight, onAction),
+            DeploymentSwipeAction(deployment.endToStartAction(), SwipeDirection.RightToLeft, onAction),
+        )
+    }
 
-    SwipeToDismissBox(
-        state = state,
+    SwipeableListItem(
+        actions = actions,
         modifier = modifier,
-        onDismiss = { value ->
-            when (value) {
-                SwipeToDismissBoxValue.StartToEnd -> onAction(DeploymentAction.Rollback(deployment))
-                SwipeToDismissBoxValue.EndToStart -> onAction(deployment.endToStartAction())
-                SwipeToDismissBoxValue.Settled -> Unit
-            }
-            scope.launch { state.reset() }
-        },
-        backgroundContent = {
-            when (state.dismissDirection) {
-                SwipeToDismissBoxValue.StartToEnd -> SwipeBackground(
-                    action = DeploymentAction.Rollback(deployment),
-                    alignment = Alignment.Start,
-                )
-                SwipeToDismissBoxValue.EndToStart -> SwipeBackground(
-                    action = deployment.endToStartAction(),
-                    alignment = Alignment.End,
-                )
-                SwipeToDismissBoxValue.Settled -> Unit
-            }
+        background = { swipeAction ->
+            SwipeActionBackground(
+                icon = swipeAction.action.icon,
+                label = stringResource(swipeAction.action.labelRes),
+                alignment = swipeAction.direction.alignment,
+                destructive = swipeAction.action !is DeploymentAction.Rollback,
+            )
         },
     ) {
         DeploymentInfoListTile(deployment = deployment, onClick = onClick)
     }
-}
-
-@Composable
-private fun SwipeBackground(
-    action: DeploymentAction,
-    alignment: Alignment.Horizontal,
-) {
-    SwipeActionBackground(
-        icon = action.icon,
-        label = stringResource(action.labelRes),
-        alignment = alignment,
-        destructive = action !is DeploymentAction.Rollback,
-    )
 }
 
 private val DeploymentAction.icon: ImageVector

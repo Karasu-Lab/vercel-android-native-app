@@ -32,6 +32,7 @@ import androidx.compose.material.icons.filled.Brightness6
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Description
 import androidx.compose.material.icons.filled.RocketLaunch
+import androidx.compose.material.icons.filled.VpnKey
 import androidx.compose.material3.DrawerState
 import androidx.compose.material3.Icon
 import androidx.compose.material3.ListItem
@@ -78,6 +79,7 @@ fun ShellDrawer(
     onThemeClick: () -> Unit,
     onDeploymentsClick: () -> Unit,
     onLogsClick: () -> Unit,
+    onEnvironmentVariablesClick: () -> Unit,
     modifier: Modifier = Modifier,
     gesturesEnabled: Boolean = true,
     content: @Composable () -> Unit,
@@ -180,6 +182,11 @@ fun ShellDrawer(
                             icon = Icons.Default.Description,
                             label = stringResource(R.string.app_logs),
                             onClick = onLogsClick,
+                        )
+                        DrawerItem(
+                            icon = Icons.Default.VpnKey,
+                            label = stringResource(R.string.environment_variables),
+                            onClick = onEnvironmentVariablesClick,
                         )
                         Spacer(Modifier.weight(1f))
                         BarSurface(modifier = Modifier.fillMaxWidth()) {

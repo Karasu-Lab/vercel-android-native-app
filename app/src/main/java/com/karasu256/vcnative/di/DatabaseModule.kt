@@ -7,6 +7,7 @@ import com.karasu256.vcnative.data.local.AppDatabase
 import com.karasu256.vcnative.data.local.AppSettingsDao
 import com.karasu256.vcnative.data.local.AppThemeDao
 import com.karasu256.vcnative.data.local.CacheDatabase
+import com.karasu256.vcnative.data.local.EnvironmentVariableDao
 import com.karasu256.vcnative.data.local.GitHubTokenDao
 import com.karasu256.vcnative.data.local.UserDao
 import dagger.Module
@@ -56,4 +57,8 @@ object DatabaseModule {
 
     @Provides
     fun provideUserDao(database: CacheDatabase): UserDao = database.userDao()
+
+    @Provides
+    fun provideEnvironmentVariableDao(database: CacheDatabase): EnvironmentVariableDao =
+        database.environmentVariableDao()
 }

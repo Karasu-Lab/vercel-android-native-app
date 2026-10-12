@@ -8,6 +8,13 @@ import com.karasu256.vcnative.data.model.CreateDeploymentRequestDto
 import com.karasu256.vcnative.data.model.DeleteDeploymentResponseDto
 import com.karasu256.vcnative.data.model.DeploymentDetailDto
 import com.karasu256.vcnative.data.model.DeploymentDto
+import com.karasu256.vcnative.data.model.EnvironmentVariableDto
+import com.karasu256.vcnative.data.model.EnvironmentVariableRequestDto
+import com.karasu256.vcnative.data.model.EnvironmentVariablesResponseDto
+import com.karasu256.vcnative.data.model.SharedEnvironmentVariableCreateRequestDto
+import com.karasu256.vcnative.data.model.SharedEnvironmentVariableDeleteRequestDto
+import com.karasu256.vcnative.data.model.SharedEnvironmentVariableUpdateRequestDto
+import com.karasu256.vcnative.data.model.SharedEnvironmentVariablesResponseDto
 import com.karasu256.vcnative.data.model.ProjectDto
 import com.karasu256.vcnative.data.model.ProjectsResponseDto
 import com.karasu256.vcnative.data.model.DeploymentStatusDto
@@ -162,6 +169,80 @@ class VercelApi @Inject constructor(
 
     suspend fun rollbackDeployment(apiKey: String, projectId: String, deploymentId: String) {
         client.post("$BASE_URL/v1/projects/$projectId/rollback/$deploymentId") { bearerAuth(apiKey) }
+    }
+
+    suspend fun getProjectEnvs(apiKey: String, projectId: String): List<EnvironmentVariableDto> =
+        client.get("$BASE_URL/v10/projects/$projectId/env") { bearerAuth(apiKey) }
+            .body<EnvironmentVariablesResponseDto>()
+            .envs
+
+    suspend fun getProjectEnv(apiKey: String, projectId: String, id: String): EnvironmentVariableDto =
+        client.get("$BASE_URL/v1/projects/$projectId/env/$id") { bearerAuth(apiKey) }.body()
+
+    suspend fun createProjectEnv(
+        apiKey: String,
+        projectId: String,
+        request: EnvironmentVariableRequestDto,
+    ) {
+        client.post("$BASE_URL/v10/projects/$projectId/env") {
+            bearerAuth(apiKey)
+            contentType(ContentType.Application.Json)
+            setBody(request)
+        }
+    }
+
+    suspend fun updateProjectEnv(
+        apiKey: String,
+        projectId: String,
+        id: String,
+        request: EnvironmentVariableRequestDto,
+    ) {
+        client.patch("$BASE_URL/v9/projects/$projectId/env/$id") {
+            bearerAuth(apiKey)
+            contentType(ContentType.Application.Json)
+            setBody(request)
+        }
+    }
+
+    suspend fun deleteProjectEnv(apiKey: String, projectId: String, id: String) {
+        client.delete("$BASE_URL/v9/projects/$projectId/env/$id") { bearerAuth(apiKey) }
+    }
+
+    suspend fun getSharedEnvs(apiKey: String, projectId: String? = null): List<EnvironmentVariableDto> =
+        client.get("$BASE_URL/v1/env") {
+            bearerAuth(apiKey)
+            projectId?.let { parameter("projectId", it) }
+        }.body<SharedEnvironmentVariablesResponseDto>().data
+
+    suspend fun unlinkSharedEnv(apiKey: String, id: String, projectId: String) {
+        client.patch("$BASE_URL/v1/env/$id/unlink/$projectId") { bearerAuth(apiKey) }
+    }
+
+    suspend fun getSharedEnv(apiKey: String, id: String): EnvironmentVariableDto =
+        client.get("$BASE_URL/v1/env/$id") { bearerAuth(apiKey) }.body()
+
+    suspend fun createSharedEnv(apiKey: String, request: SharedEnvironmentVariableCreateRequestDto) {
+        client.post("$BASE_URL/v1/env") {
+            bearerAuth(apiKey)
+            contentType(ContentType.Application.Json)
+            setBody(request)
+        }
+    }
+
+    suspend fun updateSharedEnv(apiKey: String, request: SharedEnvironmentVariableUpdateRequestDto) {
+        client.patch("$BASE_URL/v1/env") {
+            bearerAuth(apiKey)
+            contentType(ContentType.Application.Json)
+            setBody(request)
+        }
+    }
+
+    suspend fun deleteSharedEnv(apiKey: String, request: SharedEnvironmentVariableDeleteRequestDto) {
+        client.delete("$BASE_URL/v1/env") {
+            bearerAuth(apiKey)
+            contentType(ContentType.Application.Json)
+            setBody(request)
+        }
     }
 
     suspend fun getAvatarBitmap(username: String, size: Int): Bitmap? =

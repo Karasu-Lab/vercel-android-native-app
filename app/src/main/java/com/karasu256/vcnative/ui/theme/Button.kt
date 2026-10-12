@@ -3,10 +3,15 @@ package com.karasu256.vcnative.ui.theme
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.size
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.ArrowDropDown
 import androidx.compose.material3.Icon
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import com.karasu256.vcnative.ui.components.NeuButton
 import com.karasu256.vcnative.ui.components.NeuButtonVariant
@@ -43,6 +48,29 @@ fun SecondaryButton(
         variant = NeuButtonVariant.Neutral,
         content = content,
     )
+}
+
+@Composable
+fun DropdownButton(
+    label: String,
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier,
+    enabled: Boolean = true,
+) {
+    SecondaryButton(
+        onClick = onClick,
+        modifier = modifier,
+        enabled = enabled,
+    ) {
+        Text(
+            text = label,
+            modifier = Modifier.weight(1f),
+            textAlign = TextAlign.Start,
+            maxLines = 1,
+            overflow = TextOverflow.Ellipsis,
+        )
+        Icon(imageVector = Icons.Default.ArrowDropDown, contentDescription = null)
+    }
 }
 
 @Composable

@@ -66,6 +66,7 @@ import com.ramcosta.composedestinations.annotation.RootGraph
 import com.ramcosta.composedestinations.generated.NavGraphs
 import com.ramcosta.composedestinations.generated.destinations.DeploymentLogsScreenDestination
 import com.ramcosta.composedestinations.generated.destinations.DeploymentsScreenDestination
+import com.ramcosta.composedestinations.generated.destinations.EnvironmentShellScreenDestination
 import com.ramcosta.composedestinations.generated.destinations.MainScreenDestination
 import com.ramcosta.composedestinations.generated.destinations.ProjectDeploymentsScreenDestination
 import com.ramcosta.composedestinations.generated.destinations.ProjectListScreenDestination
@@ -230,6 +231,10 @@ fun ShellScreen(
                 launchSingleTop = true
             }
         },
+        onEnvironmentVariablesClick = {
+            scope.launch { drawerState.close() }
+            navigator.navigate(EnvironmentShellScreenDestination)
+        },
         gesturesEnabled = currentTab != ShellTab.Deployments || !drawerState.isClosed,
     ) {
         Box(
@@ -240,7 +245,7 @@ fun ShellScreen(
             Column(modifier = Modifier.fillMaxSize()) {
                 ShellHeader(
                     title = headerTitle,
-                    onMenuClick = { scope.launch { drawerState.open() } },
+                    onNavigationClick = { scope.launch { drawerState.open() } },
                     modifier = Modifier.zIndex(1f),
                     collapseFraction = barsCollapse,
                     trailing = if (currentTab == ShellTab.Deployments) {

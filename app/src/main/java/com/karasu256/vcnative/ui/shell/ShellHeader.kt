@@ -23,6 +23,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clipToBounds
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.layout
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
@@ -35,8 +36,10 @@ import kotlin.math.roundToInt
 @Composable
 fun ShellHeader(
     title: String,
-    onMenuClick: () -> Unit,
+    onNavigationClick: () -> Unit,
     modifier: Modifier = Modifier,
+    navigationIcon: ImageVector = Icons.Default.Menu,
+    navigationLabel: String = stringResource(R.string.open_menu),
     collapseFraction: Float = 0f,
     trailing: (@Composable RowScope.() -> Unit)? = null,
 ) {
@@ -61,10 +64,10 @@ fun ShellHeader(
                     horizontalArrangement = Arrangement.spacedBy(spacing.lg),
                     verticalAlignment = Alignment.CenterVertically,
                 ) {
-                    ToolbarButton(onClick = onMenuClick) {
+                    ToolbarButton(onClick = onNavigationClick) {
                         Icon(
-                            imageVector = Icons.Default.Menu,
-                            contentDescription = stringResource(R.string.open_menu),
+                            imageVector = navigationIcon,
+                            contentDescription = navigationLabel,
                         )
                     }
                     Text(
