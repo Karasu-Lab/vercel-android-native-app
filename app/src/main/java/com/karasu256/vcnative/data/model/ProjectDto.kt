@@ -1,6 +1,7 @@
 package com.karasu256.vcnative.data.model
 
 import kotlinx.serialization.Serializable
+import kotlinx.serialization.json.JsonPrimitive
 
 @Serializable
 data class ProjectsResponseDto(
@@ -22,7 +23,7 @@ data class ProjectLinkDto(
     val type: String? = null,
     val org: String? = null,
     val repo: String? = null,
-    val repoId: Long? = null,
+    val repoId: JsonPrimitive? = null,
     val productionBranch: String? = null,
 )
 
