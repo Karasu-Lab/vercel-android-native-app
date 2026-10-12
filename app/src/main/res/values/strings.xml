@@ -68,4 +68,23 @@
     <string name="error_cancel_deployment">Failed to cancel the deployment.</string>
     <string name="error_delete_deployment">Failed to delete the deployment.</string>
     <string name="error_rollback_unavailable">Only ready production deployments can be rolled back.</string>
+    <string name="settings_section_general">General</string>
+    <string name="settings_section_other">Other</string>
+    <string name="account">Account</string>
+    <string name="security">Security</string>
+    <string name="data_management">Data management</string>
+    <string name="debug_settings">Debug settings</string>
+    <string name="biometric_enable">Set up biometric authentication</string>
+    <string name="biometric_enable_description">Require biometric authentication every time the app is launched.</string>
+    <string name="biometric_prompt_title">Biometric authentication</string>
+    <string name="error_biometric_unavailable">Biometric authentication is not available on this device.</string>
+    <string name="app_locked">The app is locked</string>
+    <string name="unlock">Unlock</string>
+    <string name="delete_app_data">Delete app data</string>
+    <string name="delete_cache">Delete cache</string>
+    <string name="cache_deleted">Cache deleted.</string>
+    <string name="confirm_delete_app_data_title">Delete all app data?</string>
+    <string name="confirm_delete_app_data_message">Your API key, settings and cached data will be deleted, and you will be logged out.</string>
+    <string name="network_logging_enable">Enable network logging</string>
+    <string name="network_logging_description">Write Ktor requests to Logcat.</string>
 </resources>

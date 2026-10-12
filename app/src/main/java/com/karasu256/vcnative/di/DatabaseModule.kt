@@ -4,6 +4,7 @@ import android.content.Context
 import androidx.room.Room
 import com.karasu256.vcnative.data.local.ApiKeyDao
 import com.karasu256.vcnative.data.local.AppDatabase
+import com.karasu256.vcnative.data.local.AppSettingsDao
 import com.karasu256.vcnative.data.local.AppThemeDao
 import com.karasu256.vcnative.data.local.CacheDatabase
 import com.karasu256.vcnative.data.local.GitHubTokenDao
@@ -26,7 +27,11 @@ object DatabaseModule {
             context,
             AppDatabase::class.java,
             File(context.filesDir, AppDatabase.NAME).absolutePath,
-        ).addMigrations(AppDatabase.MIGRATION_1_2, AppDatabase.MIGRATION_2_3).build()
+        ).addMigrations(
+            AppDatabase.MIGRATION_1_2,
+            AppDatabase.MIGRATION_2_3,
+            AppDatabase.MIGRATION_3_4,
+        ).build()
 
     @Provides
     @Singleton
@@ -45,6 +50,9 @@ object DatabaseModule {
 
     @Provides
     fun provideGitHubTokenDao(database: AppDatabase): GitHubTokenDao = database.gitHubTokenDao()
+
+    @Provides
+    fun provideAppSettingsDao(database: AppDatabase): AppSettingsDao = database.appSettingsDao()
 
     @Provides
     fun provideUserDao(database: CacheDatabase): UserDao = database.userDao()
