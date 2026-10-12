@@ -50,23 +50,30 @@ import androidx.compose.ui.unit.Velocity
 import androidx.compose.ui.zIndex
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.navigation.NavBackStackEntry
+import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import com.karasu256.vcnative.R
 import com.karasu256.vcnative.ui.activitys.AppThemeViewModel
 import com.karasu256.vcnative.ui.deployments.create.ProjectSelectDialog
 import com.karasu256.vcnative.ui.theme.BarSurface
+import com.karasu256.vcnative.ui.theme.NeuNavTransitions
 import com.karasu256.vcnative.ui.theme.NeuTheme
 import com.karasu256.vcnative.ui.theme.TabButton
 import com.ramcosta.composedestinations.DestinationsNavHost
 import com.ramcosta.composedestinations.annotation.Destination
 import com.ramcosta.composedestinations.annotation.RootGraph
 import com.ramcosta.composedestinations.generated.NavGraphs
+import com.ramcosta.composedestinations.generated.destinations.DeploymentLogsScreenDestination
 import com.ramcosta.composedestinations.generated.destinations.DeploymentsScreenDestination
 import com.ramcosta.composedestinations.generated.destinations.MainScreenDestination
+import com.ramcosta.composedestinations.generated.destinations.ProjectDeploymentsScreenDestination
+import com.ramcosta.composedestinations.generated.destinations.ProjectListScreenDestination
 import com.ramcosta.composedestinations.generated.destinations.SettingsScreenDestination
 import com.ramcosta.composedestinations.generated.destinations.ShellScreenDestination
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
 import com.ramcosta.composedestinations.navigation.dependency
+import com.ramcosta.composedestinations.spec.DestinationSpec
 import com.ramcosta.composedestinations.spec.DirectionDestinationSpec
 import com.ramcosta.composedestinations.utils.currentDestinationAsState
 import com.ramcosta.composedestinations.utils.rememberDestinationsNavigator
@@ -83,6 +90,25 @@ enum class ShellTab(
     Settings(SettingsScreenDestination, Icons.Default.Settings, R.string.settings),
 }
 
+@Composable
+private fun shellHeaderTitle(
+    destination: DestinationSpec?,
+    backStackEntry: NavBackStackEntry?,
+    tab: ShellTab?,
+): String {
+    val entry = backStackEntry?.takeIf { it.destination.route == destination?.route }
+    return when {
+        destination == ProjectListScreenDestination -> stringResource(R.string.app_logs)
+        destination == ProjectDeploymentsScreenDestination && entry != null ->
+            ProjectDeploymentsScreenDestination.argsFrom(entry).projectName
+
+        destination == DeploymentLogsScreenDestination && entry != null ->
+            DeploymentLogsScreenDestination.argsFrom(entry).title
+
+        else -> stringResource((tab ?: ShellTab.Deployments).labelRes)
+    }
+}
+
 @Destination<RootGraph>
 @Composable
 fun ShellScreen(
@@ -95,8 +121,9 @@ fun ShellScreen(
     val navController = rememberNavController()
     val tabNavigator = navController.rememberDestinationsNavigator()
     val currentDestination by navController.currentDestinationAsState()
+    val backStackEntry by navController.currentBackStackEntryAsState()
     val currentTab = ShellTab.entries.firstOrNull { it.destination == currentDestination }
-        ?: ShellTab.Deployments
+    val headerTitle = shellHeaderTitle(currentDestination, backStackEntry, currentTab)
     val drawerState = rememberDrawerState(DrawerValue.Closed)
     val scope = rememberCoroutineScope()
     val spacing = NeuTheme.spacing
@@ -126,6 +153,15 @@ fun ShellScreen(
                 }
                 return Velocity.Zero
             }
+        }
+    }
+
+    val navigateToTab = { tab: ShellTab ->
+        val isOnTab = currentTab != null
+        tabNavigator.navigate(tab.destination) {
+            popUpTo(NavGraphs.shell) { saveState = isOnTab }
+            launchSingleTop = true
+            restoreState = isOnTab
         }
     }
 
@@ -169,6 +205,20 @@ fun ShellScreen(
         avatar = uiState.avatar,
         onUserClick = { viewModel.showSheet(ShellSheet.User) },
         onThemeClick = { viewModel.showSheet(ShellSheet.Theme) },
+        onDeploymentsClick = {
+            scope.launch { drawerState.close() }
+            tabNavigator.navigate(DeploymentsScreenDestination) {
+                popUpTo(NavGraphs.shell) { inclusive = false }
+                launchSingleTop = true
+            }
+        },
+        onLogsClick = {
+            scope.launch { drawerState.close() }
+            tabNavigator.navigate(ProjectListScreenDestination) {
+                popUpTo(DeploymentsScreenDestination) { inclusive = false }
+                launchSingleTop = true
+            }
+        },
         gesturesEnabled = currentTab != ShellTab.Deployments || !drawerState.isClosed,
     ) {
         Box(
@@ -178,7 +228,7 @@ fun ShellScreen(
         ) {
             Column(modifier = Modifier.fillMaxSize()) {
                 ShellHeader(
-                    title = stringResource(currentTab.labelRes),
+                    title = headerTitle,
                     onMenuClick = { scope.launch { drawerState.open() } },
                     modifier = Modifier.zIndex(1f),
                     collapseFraction = barsCollapse,
@@ -203,6 +253,7 @@ fun ShellScreen(
                     DestinationsNavHost(
                         navGraph = NavGraphs.shell,
                         navController = navController,
+                        defaultTransitions = NeuNavTransitions,
                         dependenciesContainerBuilder = { dependency(RootNavigator(navigator)) },
                         modifier = Modifier
                             .weight(1f)
@@ -227,13 +278,7 @@ fun ShellScreen(
                     ShellTab.entries.forEach { tab ->
                         TabButton(
                             selected = tab == currentTab,
-                            onClick = {
-                                tabNavigator.navigate(tab.destination) {
-                                    popUpTo(NavGraphs.shell) { saveState = true }
-                                    launchSingleTop = true
-                                    restoreState = true
-                                }
-                            },
+                            onClick = { navigateToTab(tab) },
                         ) {
                             Icon(
                                 imageVector = tab.icon,

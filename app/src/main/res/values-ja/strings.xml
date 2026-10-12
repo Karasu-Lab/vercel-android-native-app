@@ -87,4 +87,22 @@
     <string name="confirm_delete_app_data_message">API キー、設定、キャッシュが削除され、ログアウトされます。</string>
     <string name="network_logging_enable">ネットワークのロギングを有効にする</string>
     <string name="network_logging_description">Ktor のリクエストを Logcat に出力します。</string>
+    <string name="drawer_section_application">アプリケーション</string>
+    <string name="deployment_list">デプロイ一覧</string>
+    <string name="app_logs">アプリのログ</string>
+    <string name="production_deployment">本番</string>
+    <string name="latest_deployment">最新</string>
+    <string name="past_deployments">過去</string>
+    <string name="no_deployments">デプロイがありません。</string>
+    <string name="no_projects">プロジェクトがありません。</string>
+    <string name="no_logs">ログはまだありません。</string>
+    <string name="error_load_logs">ログを取得できませんでした。</string>
+    <string name="log_no_output">（出力なし）</string>
+    <string name="log_output">標準出力</string>
+    <string name="label_time">日時</string>
+    <string name="label_level">レベル</string>
+    <string name="label_source">ソース</string>
+    <string name="label_domain">ドメイン</string>
+    <string name="copy_output">出力をコピー</string>
+    <string name="copied">コピーしました</string>
 </resources>

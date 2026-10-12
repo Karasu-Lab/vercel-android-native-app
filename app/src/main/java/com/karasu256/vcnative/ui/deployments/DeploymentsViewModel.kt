@@ -2,6 +2,7 @@ package com.karasu256.vcnative.ui.deployments
 
 import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.graphics.asImageBitmap
+import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.karasu256.vcnative.data.model.DeploymentDto
@@ -13,6 +14,8 @@ import com.karasu256.vcnative.R
 import com.karasu256.vcnative.data.repository.ApiKeyRepository
 import com.karasu256.vcnative.data.repository.DeploymentRepository
 import com.karasu256.vcnative.data.repository.ProjectFilterRepository
+import com.karasu256.vcnative.ui.components.Refreshable
+import com.ramcosta.composedestinations.generated.destinations.ProjectDeploymentsScreenDestination
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.Job
@@ -27,12 +30,13 @@ import javax.inject.Inject
 
 @HiltViewModel
 class DeploymentsViewModel @Inject constructor(
+    savedStateHandle: SavedStateHandle,
     private val apiKeyRepository: ApiKeyRepository,
     private val api: VercelApi,
     private val statusTracker: DeploymentStatusTracker,
     private val projectFilterRepository: ProjectFilterRepository,
     private val deploymentRepository: DeploymentRepository,
-) : ViewModel() {
+) : ViewModel(), Refreshable {
 
     private val _uiState = MutableStateFlow(DeploymentsUiState())
     val uiState = _uiState.asStateFlow()
@@ -40,9 +44,12 @@ class DeploymentsViewModel @Inject constructor(
     private val _events = Channel<DeploymentsEvent>(Channel.BUFFERED)
     val events = _events.receiveAsFlow()
 
+    private val fixedProjectId: String? =
+        runCatching { ProjectDeploymentsScreenDestination.argsFrom(savedStateHandle).projectId }.getOrNull()
+
     private var apiKey: String? = null
     private var nextCursor: Long? = null
-    private var projectId: String? = null
+    private var projectId: String? = fixedProjectId
     private var loadJob: Job? = null
     private val followJobs = mutableMapOf<String, Job>()
     private val avatars = mutableMapOf<String, ImageBitmap>()
@@ -52,11 +59,15 @@ class DeploymentsViewModel @Inject constructor(
         viewModelScope.launch {
             val key = apiKeyRepository.read() ?: return@launch
             apiKey = key
-            launch {
-                projectFilterRepository.selected.collect { project ->
-                    projectId = project?.id
-                    _uiState.update { it.copy(filterProject = project) }
-                    reload()
+            if (fixedProjectId != null) {
+                reload()
+            } else {
+                launch {
+                    projectFilterRepository.selected.collect { project ->
+                        projectId = project?.id
+                        _uiState.update { it.copy(filterProject = project) }
+                        reload()
+                    }
                 }
             }
 
@@ -102,7 +113,7 @@ class DeploymentsViewModel @Inject constructor(
         }
     }
 
-    fun refresh() {
+    override fun refresh() {
         if (_uiState.value.isRefreshing) return
         reload()
     }

@@ -95,7 +95,7 @@ fun DeploymentsScreen(
             isLoadingMore = uiState.isLoadingMore,
             isRefreshing = uiState.isRefreshing,
             onLoadMore = viewModel::loadMore,
-            onRefresh = viewModel::refresh,
+            refreshable = viewModel,
             onDeploymentClick = { deployment ->
                 rootNavigator.navigator.navigate(DeploymentDetailScreenDestination(deploymentId = deployment.id))
             },

@@ -24,8 +24,8 @@ class ProjectRepository @Inject constructor(
 
     private val mutex = Mutex()
 
-    suspend fun load() = mutex.withLock {
-        if (_projects.value != null) return@withLock
+    suspend fun load(force: Boolean = false) = mutex.withLock {
+        if (!force && _projects.value != null) return@withLock
         val apiKey = apiKeyRepository.read() ?: return@withLock
         val projects = try {
             api.getProjects(apiKey).map { project ->
@@ -42,12 +42,15 @@ class ProjectRepository @Inject constructor(
         } catch (e: CancellationException) {
             throw e
         } catch (e: Exception) {
+            if (_projects.value != null) return@withLock
             emptyList()
         }
-        _projects.value = projects.map { ProjectWithAvatar(it) }
+        val loadedAvatars = _projects.value.orEmpty().associate { it.project.id to it.avatar }
+        _projects.value = projects.map { ProjectWithAvatar(it, loadedAvatars[it.id]) }
 
         coroutineScope {
             projects.forEach { project ->
+                if (loadedAvatars[project.id] != null) return@forEach
                 val hash = project.avatarHash ?: return@forEach
                 launch {
                     val avatar = try {
