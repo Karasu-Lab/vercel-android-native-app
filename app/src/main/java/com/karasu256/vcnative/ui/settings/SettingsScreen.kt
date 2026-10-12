@@ -21,6 +21,7 @@ import androidx.compose.ui.res.stringResource
 import com.karasu256.vcnative.R
 import com.karasu256.vcnative.ui.shell.RootNavigator
 import com.karasu256.vcnative.ui.shell.ShellGraph
+import com.karasu256.vcnative.ui.theme.NeuFadeTransitions
 import com.karasu256.vcnative.ui.theme.SectionHeader
 import com.ramcosta.composedestinations.annotation.Destination
 import com.ramcosta.composedestinations.generated.destinations.AccountScreenDestination
@@ -29,7 +30,7 @@ import com.ramcosta.composedestinations.generated.destinations.DebugSettingsScre
 import com.ramcosta.composedestinations.generated.destinations.LicensesScreenDestination
 import com.ramcosta.composedestinations.generated.destinations.SecurityScreenDestination
 
-@Destination<ShellGraph>
+@Destination<ShellGraph>(style = NeuFadeTransitions::class)
 @Composable
 fun SettingsScreen(
     rootNavigator: RootNavigator,

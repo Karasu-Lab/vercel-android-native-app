@@ -90,6 +90,8 @@
     <string name="network_logging_description">Write Ktor requests to Logcat.</string>
     <string name="drawer_section_application">Application</string>
     <string name="deployment_list">Deployment list</string>
+    <string name="deployment_tab_all">All</string>
+    <string name="deployment_tab_development">Development</string>
     <string name="app_logs">App logs</string>
     <string name="production_deployment">Production</string>
     <string name="latest_deployment">Latest</string>

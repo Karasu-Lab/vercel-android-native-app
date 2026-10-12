@@ -19,11 +19,11 @@ import com.ramcosta.composedestinations.generated.destinations.ProjectDeployment
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.Job
-import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -41,8 +41,8 @@ class DeploymentsViewModel @Inject constructor(
     private val _uiState = MutableStateFlow(DeploymentsUiState())
     val uiState = _uiState.asStateFlow()
 
-    private val _events = Channel<DeploymentsEvent>(Channel.BUFFERED)
-    val events = _events.receiveAsFlow()
+    private val _events = MutableSharedFlow<DeploymentsEvent>()
+    val events = _events.asSharedFlow()
 
     private val fixedProjectId: String? =
         runCatching { ProjectDeploymentsScreenDestination.argsFrom(savedStateHandle).projectId }.getOrNull()
@@ -180,7 +180,7 @@ class DeploymentsViewModel @Inject constructor(
     fun requestAction(action: DeploymentAction) {
         if (_uiState.value.isActionRunning) return
         if (action is DeploymentAction.Rollback && !action.deployment.canRollback) {
-            viewModelScope.launch { _events.send(DeploymentsEvent.Message(R.string.error_rollback_unavailable)) }
+            viewModelScope.launch { _events.emit(DeploymentsEvent.Message(R.string.error_rollback_unavailable)) }
             return
         }
         _uiState.update { it.copy(pendingAction = action) }
@@ -203,7 +203,7 @@ class DeploymentsViewModel @Inject constructor(
                 is DeploymentAction.Delete -> delete(action.deployment)
             }
             _uiState.update { it.copy(pendingAction = null, isActionRunning = false) }
-            _events.send(DeploymentsEvent.Message(messageRes))
+            _events.emit(DeploymentsEvent.Message(messageRes))
         }
     }
 
