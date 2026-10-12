@@ -38,6 +38,7 @@ import com.karasu256.vcnative.ui.shell.RootNavigator
 import com.karasu256.vcnative.ui.shell.ShellGraph
 import com.karasu256.vcnative.ui.theme.ActionFab
 import com.karasu256.vcnative.ui.theme.FloatingSnackbarHost
+import com.karasu256.vcnative.ui.theme.NeuFadeTransitions
 import com.karasu256.vcnative.ui.theme.NeuTheme
 import com.karasu256.vcnative.ui.theme.TabBar
 import com.karasu256.vcnative.ui.theme.TabItem
@@ -48,7 +49,7 @@ import kotlin.math.roundToInt
 
 private class CreateDeploymentSession(val initialProject: Project?)
 
-@Destination<ShellGraph>(start = true)
+@Destination<ShellGraph>(start = true, style = NeuFadeTransitions::class)
 @Composable
 fun DeploymentsScreen(
     rootNavigator: RootNavigator,

@@ -55,9 +55,9 @@ import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import com.karasu256.vcnative.R
 import com.karasu256.vcnative.ui.activitys.AppThemeViewModel
+import com.karasu256.vcnative.ui.deployments.DeploymentsViewModel
 import com.karasu256.vcnative.ui.deployments.create.ProjectSelectDialog
 import com.karasu256.vcnative.ui.theme.BarSurface
-import com.karasu256.vcnative.ui.theme.NeuNavTransitions
 import com.karasu256.vcnative.ui.theme.NeuTheme
 import com.karasu256.vcnative.ui.theme.TabButton
 import com.ramcosta.composedestinations.DestinationsNavHost
@@ -124,6 +124,9 @@ fun ShellScreen(
     val backStackEntry by navController.currentBackStackEntryAsState()
     val currentTab = ShellTab.entries.firstOrNull { it.destination == currentDestination }
     val headerTitle = shellHeaderTitle(currentDestination, backStackEntry, currentTab)
+    val deploymentsViewModel = backStackEntry
+        ?.takeIf { currentDestination == DeploymentsScreenDestination }
+        ?.let { entry -> hiltViewModel<DeploymentsViewModel>(entry) }
     val drawerState = rememberDrawerState(DrawerValue.Closed)
     val scope = rememberCoroutineScope()
     val spacing = NeuTheme.spacing
@@ -157,11 +160,15 @@ fun ShellScreen(
     }
 
     val navigateToTab = { tab: ShellTab ->
-        val isOnTab = currentTab != null
-        tabNavigator.navigate(tab.destination) {
-            popUpTo(NavGraphs.shell) { saveState = isOnTab }
-            launchSingleTop = true
-            restoreState = isOnTab
+        if (tab == currentTab) {
+            deploymentsViewModel?.refresh()
+        } else {
+            val isOnTab = currentTab != null
+            tabNavigator.navigate(tab.destination) {
+                popUpTo(NavGraphs.shell) { saveState = isOnTab }
+                launchSingleTop = true
+                restoreState = isOnTab
+            }
         }
     }
 
@@ -207,9 +214,13 @@ fun ShellScreen(
         onThemeClick = { viewModel.showSheet(ShellSheet.Theme) },
         onDeploymentsClick = {
             scope.launch { drawerState.close() }
-            tabNavigator.navigate(DeploymentsScreenDestination) {
-                popUpTo(NavGraphs.shell) { inclusive = false }
-                launchSingleTop = true
+            if (deploymentsViewModel != null) {
+                deploymentsViewModel.refresh()
+            } else {
+                tabNavigator.navigate(DeploymentsScreenDestination) {
+                    popUpTo(NavGraphs.shell) { inclusive = false }
+                    launchSingleTop = true
+                }
             }
         },
         onLogsClick = {
@@ -253,7 +264,7 @@ fun ShellScreen(
                     DestinationsNavHost(
                         navGraph = NavGraphs.shell,
                         navController = navController,
-                        defaultTransitions = NeuNavTransitions,
+                        defaultTransitions = ShellNavTransitions,
                         dependenciesContainerBuilder = { dependency(RootNavigator(navigator)) },
                         modifier = Modifier
                             .weight(1f)
