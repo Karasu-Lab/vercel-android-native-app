@@ -3,7 +3,6 @@ package com.karasu256.vcnative.ui.activitys
 import android.content.Intent
 import android.graphics.Color
 import android.os.Bundle
-import androidx.activity.ComponentActivity
 import androidx.activity.SystemBarStyle
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
@@ -13,10 +12,12 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
+import androidx.fragment.app.FragmentActivity
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.lifecycleScope
 import com.karasu256.vcnative.data.repository.GitHubAuthRepository
 import com.karasu256.vcnative.data.model.AppTheme
+import com.karasu256.vcnative.ui.security.AppLockScreen
 import com.karasu256.vcnative.ui.theme.AppBackground
 import com.karasu256.vcnative.ui.theme.NeuNavTransitions
 import com.karasu256.vcnative.ui.theme.NeuTheme
@@ -27,8 +28,9 @@ import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @AndroidEntryPoint
-class MainActivity : ComponentActivity() {
+class MainActivity : FragmentActivity() {
     private val appThemeViewModel: AppThemeViewModel by viewModels()
+    private val appLockViewModel: AppLockViewModel by viewModels()
 
     @Inject
     lateinit var gitHubAuthRepository: GitHubAuthRepository
@@ -39,6 +41,7 @@ class MainActivity : ComponentActivity() {
         handleAuthCallback(intent)
         setContent {
             val appTheme by appThemeViewModel.theme.collectAsStateWithLifecycle()
+            val lockState by appLockViewModel.state.collectAsStateWithLifecycle()
             val darkTheme = when (appTheme) {
                 AppTheme.System -> isSystemInDarkTheme()
                 AppTheme.Light -> false
@@ -52,10 +55,14 @@ class MainActivity : ComponentActivity() {
 
             NeuTheme(darkTheme = darkTheme) {
                 AppBackground(modifier = Modifier.fillMaxSize()) {
-                    DestinationsNavHost(
-                        navGraph = NavGraphs.root,
-                        defaultTransitions = NeuNavTransitions,
-                    )
+                    when (lockState) {
+                        AppLockState.Checking -> Unit
+                        AppLockState.Locked -> AppLockScreen(onUnlocked = appLockViewModel::unlock)
+                        AppLockState.Unlocked -> DestinationsNavHost(
+                            navGraph = NavGraphs.root,
+                            defaultTransitions = NeuNavTransitions,
+                        )
+                    }
                 }
             }
         }

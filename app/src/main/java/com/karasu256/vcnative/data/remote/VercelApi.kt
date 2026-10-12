@@ -28,7 +28,7 @@ import io.ktor.http.ContentType
 import io.ktor.http.contentType
 import io.ktor.client.request.prepareGet
 import io.ktor.client.statement.bodyAsChannel
-import io.ktor.utils.io.readUTF8Line
+import io.ktor.utils.io.readLine
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 import kotlinx.serialization.json.Json
@@ -84,7 +84,7 @@ class VercelApi @Inject constructor(
         }.execute { response ->
             val channel = response.bodyAsChannel()
             while (true) {
-                val line = channel.readUTF8Line() ?: break
+                val line = channel.readLine() ?: break
                 if (line.isBlank()) continue
                 runCatching { json.decodeFromString<VercelEvent>(line) }
                     .getOrNull()

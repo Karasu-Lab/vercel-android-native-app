@@ -6,8 +6,13 @@ import androidx.room.migration.Migration
 import androidx.sqlite.db.SupportSQLiteDatabase
 
 @Database(
-    entities = [ApiKeyEntity::class, AppThemeEntity::class, GitHubTokenEntity::class],
-    version = 3,
+    entities = [
+        ApiKeyEntity::class,
+        AppThemeEntity::class,
+        GitHubTokenEntity::class,
+        AppSettingsEntity::class,
+    ],
+    version = 4,
     exportSchema = false,
 )
 abstract class AppDatabase : RoomDatabase() {
@@ -16,6 +21,8 @@ abstract class AppDatabase : RoomDatabase() {
     abstract fun appThemeDao(): AppThemeDao
 
     abstract fun gitHubTokenDao(): GitHubTokenDao
+
+    abstract fun appSettingsDao(): AppSettingsDao
 
     companion object {
         const val NAME = "app.db"
@@ -32,6 +39,14 @@ abstract class AppDatabase : RoomDatabase() {
             override fun migrate(db: SupportSQLiteDatabase) {
                 db.execSQL(
                     "CREATE TABLE IF NOT EXISTS `github_token` (`id` INTEGER NOT NULL, `value` TEXT NOT NULL, PRIMARY KEY(`id`))"
+                )
+            }
+        }
+
+        val MIGRATION_3_4 = object : Migration(3, 4) {
+            override fun migrate(db: SupportSQLiteDatabase) {
+                db.execSQL(
+                    "CREATE TABLE IF NOT EXISTS `app_settings` (`id` INTEGER NOT NULL, `biometricLockEnabled` INTEGER NOT NULL, `networkLoggingEnabled` INTEGER NOT NULL, PRIMARY KEY(`id`))"
                 )
             }
         }

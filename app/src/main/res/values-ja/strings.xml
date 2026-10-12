@@ -67,4 +67,24 @@
     <string name="error_cancel_deployment">デプロイをキャンセルできませんでした。</string>
     <string name="error_delete_deployment">デプロイを削除できませんでした。</string>
     <string name="error_rollback_unavailable">ロールバックできるのは完了済みの本番デプロイのみです。</string>
+    <string name="settings_section_general">一般</string>
+    <string name="settings_section_other">その他</string>
+    <string name="account">アカウント</string>
+    <string name="security">セキュリティ</string>
+    <string name="data_management">データ管理</string>
+    <string name="debug_settings">デバッグ設定</string>
+    <string name="licenses">ライセンス</string>
+    <string name="biometric_enable">生体認証を設定する</string>
+    <string name="biometric_enable_description">アプリの起動時に毎回生体認証を求めます。</string>
+    <string name="biometric_prompt_title">生体認証</string>
+    <string name="error_biometric_unavailable">この端末では生体認証を利用できません。</string>
+    <string name="app_locked">アプリはロックされています</string>
+    <string name="unlock">ロック解除</string>
+    <string name="delete_app_data">アプリのデータを削除</string>
+    <string name="delete_cache">キャッシュを削除</string>
+    <string name="cache_deleted">キャッシュを削除しました。</string>
+    <string name="confirm_delete_app_data_title">アプリのデータをすべて削除しますか？</string>
+    <string name="confirm_delete_app_data_message">API キー、設定、キャッシュが削除され、ログアウトされます。</string>
+    <string name="network_logging_enable">ネットワークのロギングを有効にする</string>
+    <string name="network_logging_description">Ktor のリクエストを Logcat に出力します。</string>
 </resources>
