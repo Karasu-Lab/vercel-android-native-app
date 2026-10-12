@@ -13,8 +13,10 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.SnackbarData
+import androidx.compose.material3.SnackbarDuration
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.remember
@@ -27,6 +29,7 @@ import androidx.compose.ui.layout.onSizeChanged
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.unit.IntOffset
 import com.karasu256.vcnative.ui.theme.NeuTheme
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlin.math.roundToInt
 
@@ -36,8 +39,20 @@ fun NeuSnackbarHost(
     modifier: Modifier = Modifier,
 ) {
     val style = NeuTheme.snackbar
+    val current = hostState.currentSnackbarData
+
+    LaunchedEffect(current) {
+        val timeoutMillis = when (current?.visuals?.duration) {
+            SnackbarDuration.Short -> 4000L
+            SnackbarDuration.Long -> 10000L
+            else -> return@LaunchedEffect
+        }
+        delay(timeoutMillis)
+        current?.dismiss()
+    }
+
     AnimatedContent(
-        targetState = hostState.currentSnackbarData,
+        targetState = current,
         modifier = modifier,
         transitionSpec = { (style.enter togetherWith style.exit).using(SizeTransform(clip = false)) },
         contentAlignment = Alignment.TopCenter,

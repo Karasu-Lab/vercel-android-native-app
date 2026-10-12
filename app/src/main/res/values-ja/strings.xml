@@ -89,6 +89,8 @@
     <string name="network_logging_description">Ktor のリクエストを Logcat に出力します。</string>
     <string name="drawer_section_application">アプリケーション</string>
     <string name="deployment_list">デプロイ一覧</string>
+    <string name="deployment_tab_all">全て</string>
+    <string name="deployment_tab_development">開発</string>
     <string name="app_logs">アプリのログ</string>
     <string name="production_deployment">本番</string>
     <string name="latest_deployment">最新</string>

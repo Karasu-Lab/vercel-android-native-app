@@ -16,6 +16,7 @@ import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.transformWhile
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -64,7 +65,10 @@ class DeploymentDetailViewModel @Inject constructor(
             }
 
             if (dto.readyState.isInProgress) {
-                statusTracker.track(deploymentId).collect { status ->
+                statusTracker.track(deploymentId).transformWhile { status ->
+                    emit(status)
+                    status.readyState.isInProgress
+                }.collect { status ->
                     _uiState.update { state ->
                         val detail = state.detail ?: return@update state
                         val startedAt = status.buildingAt ?: detail.startedAt

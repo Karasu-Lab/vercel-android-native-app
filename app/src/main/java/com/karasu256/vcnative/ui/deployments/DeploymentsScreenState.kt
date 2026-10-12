@@ -2,6 +2,7 @@ package com.karasu256.vcnative.ui.deployments
 
 import androidx.annotation.StringRes
 import androidx.compose.ui.graphics.ImageBitmap
+import com.karasu256.vcnative.R
 import com.karasu256.vcnative.data.model.DeploymentState
 import com.karasu256.vcnative.data.model.isInProgress
 import com.karasu256.vcnative.data.model.Project
@@ -27,6 +28,21 @@ data class DeploymentInfo(
 ) {
     val canRollback: Boolean
         get() = projectId != null && target == "production" && state == DeploymentState.Ready
+}
+
+enum class DeploymentTab(@StringRes val labelRes: Int) {
+    All(R.string.deployment_tab_all),
+    Production(R.string.environment_production),
+    Preview(R.string.environment_preview),
+    Development(R.string.deployment_tab_development),
+    ;
+
+    fun accepts(deployment: DeploymentInfo): Boolean = when (this) {
+        All -> true
+        Production -> deployment.target == "production"
+        Preview -> deployment.target == null || deployment.target == "preview"
+        Development -> deployment.target == "development"
+    }
 }
 
 sealed interface DeploymentAction {
