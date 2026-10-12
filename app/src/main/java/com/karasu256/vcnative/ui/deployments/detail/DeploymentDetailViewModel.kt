@@ -111,6 +111,7 @@ class DeploymentDetailViewModel @Inject constructor(
         val startedAt = buildingAt ?: createdAt
         return DeploymentDetail(
             id = id,
+            projectId = projectId,
             projectName = name,
             siteUrl = (alias.firstOrNull() ?: url)?.let { "https://$it" },
             state = readyState,

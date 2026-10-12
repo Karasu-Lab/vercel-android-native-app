@@ -28,6 +28,7 @@ import com.karasu256.vcnative.ui.theme.PrimaryButton
 import com.karasu256.vcnative.ui.theme.SecondaryButton
 import com.ramcosta.composedestinations.annotation.Destination
 import com.ramcosta.composedestinations.annotation.RootGraph
+import com.ramcosta.composedestinations.generated.destinations.DeploymentLogsDetailScreenDestination
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -79,8 +80,18 @@ fun DeploymentDetailScreen(
                 Text(text = stringResource(R.string.view_site))
             }
             SecondaryButton(
-                onClick = {},
+                onClick = {
+                    val projectId = detail?.projectId ?: return@SecondaryButton
+                    navigator.navigate(
+                        DeploymentLogsDetailScreenDestination(
+                            projectId = projectId,
+                            deploymentId = deploymentId,
+                            title = detail.projectName,
+                        )
+                    )
+                },
                 modifier = Modifier.fillMaxWidth(),
+                enabled = detail?.projectId != null,
             ) {
                 Text(text = stringResource(R.string.view_logs))
             }

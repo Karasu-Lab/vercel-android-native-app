@@ -71,6 +71,7 @@ data class DeploymentMetaDto(
 @Serializable
 data class DeploymentDetailDto(
     val id: String,
+    val projectId: String? = null,
     val name: String,
     val url: String? = null,
     val readyState: DeploymentState = DeploymentState.Unknown,

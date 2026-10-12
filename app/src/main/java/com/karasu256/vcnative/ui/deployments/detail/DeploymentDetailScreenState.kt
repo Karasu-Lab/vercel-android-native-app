@@ -6,6 +6,7 @@ import com.karasu256.vcnative.ui.deployments.DeploymentCreator
 
 data class DeploymentDetail(
     val id: String,
+    val projectId: String?,
     val projectName: String,
     val siteUrl: String?,
     val state: DeploymentState,
