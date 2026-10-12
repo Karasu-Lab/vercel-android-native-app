@@ -47,6 +47,14 @@ fun DeploymentLogsScreen(
     title: String,
     viewModel: DeploymentLogsViewModel = hiltViewModel(),
 ) {
+    DeploymentLogsContent(viewModel = viewModel)
+}
+
+@Composable
+fun DeploymentLogsContent(
+    viewModel: DeploymentLogsViewModel,
+    modifier: Modifier = Modifier,
+) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     var selected by remember { mutableStateOf<LogItem?>(null) }
 
@@ -59,7 +67,7 @@ fun DeploymentLogsScreen(
     RefreshBox(
         refreshable = viewModel,
         isRefreshing = uiState.isRefreshing,
-        modifier = Modifier.fillMaxSize(),
+        modifier = modifier.fillMaxSize(),
     ) {
         when {
             logs == null -> Column(
