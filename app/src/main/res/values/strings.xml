@@ -74,6 +74,7 @@
     <string name="security">Security</string>
     <string name="data_management">Data management</string>
     <string name="debug_settings">Debug settings</string>
+    <string name="licenses">Licenses</string>
     <string name="biometric_enable">Set up biometric authentication</string>
     <string name="biometric_enable_description">Require biometric authentication every time the app is launched.</string>
     <string name="biometric_prompt_title">Biometric authentication</string>
