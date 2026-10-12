@@ -3,10 +3,10 @@ package com.karasu256.vcnative.ui.shell
 import androidx.compose.ui.graphics.asImageBitmap
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.karasu256.vcnative.data.remote.VercelApi
 import com.karasu256.vcnative.data.repository.ApiKeyRepository
 import com.karasu256.vcnative.data.repository.ProjectFilterRepository
 import com.karasu256.vcnative.data.repository.ProjectRepository
+import com.karasu256.vcnative.data.repository.UserProfileRepository
 import com.karasu256.vcnative.data.repository.UserRepository
 import com.karasu256.vcnative.ui.deployments.create.ProjectItem
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -23,7 +23,7 @@ import javax.inject.Inject
 class ShellViewModel @Inject constructor(
     private val apiKeyRepository: ApiKeyRepository,
     private val userRepository: UserRepository,
-    private val api: VercelApi,
+    private val userProfileRepository: UserProfileRepository,
     private val projectRepository: ProjectRepository,
     private val projectFilterRepository: ProjectFilterRepository,
 ) : ViewModel() {
@@ -35,12 +35,11 @@ class ShellViewModel @Inject constructor(
     val events = _events.receiveAsFlow()
 
     init {
+        viewModelScope.launch { userProfileRepository.load() }
         viewModelScope.launch {
-            val user = runCatching { userRepository.restore() }.getOrNull() ?: return@launch
-            _uiState.update { it.copy(user = user) }
-            val avatar = runCatching { api.getAvatarBitmap(user.username, AVATAR_SIZE) }.getOrNull()
-                ?.asImageBitmap()
-            _uiState.update { it.copy(avatar = avatar) }
+            userProfileRepository.profile.collect { profile ->
+                _uiState.update { it.copy(user = profile.user, avatar = profile.avatar) }
+            }
         }
         viewModelScope.launch {
             combine(
@@ -83,14 +82,11 @@ class ShellViewModel @Inject constructor(
         _uiState.update { it.copy(sheet = null) }
     }
 
-    companion object {
-        private const val AVATAR_SIZE = 128
-    }
-
     fun logout() {
         viewModelScope.launch {
             userRepository.write(null)
             apiKeyRepository.write(null)
+            userProfileRepository.clear()
             _uiState.update { it.copy(sheet = null) }
             _events.send(ShellEvent.LoggedOut)
         }
