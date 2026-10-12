@@ -23,10 +23,9 @@ import androidx.compose.ui.res.stringResource
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.karasu256.vcnative.R
-import com.karasu256.vcnative.ui.components.NeuButton
-import com.karasu256.vcnative.ui.components.NeuButtonVariant
-import com.karasu256.vcnative.ui.components.NeuText
 import com.karasu256.vcnative.ui.theme.NeuTheme
+import com.karasu256.vcnative.ui.theme.PrimaryButton
+import com.karasu256.vcnative.ui.theme.SecondaryButton
 import com.ramcosta.composedestinations.annotation.Destination
 import com.ramcosta.composedestinations.annotation.RootGraph
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
@@ -72,19 +71,18 @@ fun DeploymentDetailScreen(
                 isLoading = uiState.isThumbnailLoading,
                 contentDescription = detail?.projectName,
             )
-            NeuButton(
+            PrimaryButton(
                 onClick = { detail?.siteUrl?.let(uriHandler::openUri) },
                 modifier = Modifier.fillMaxWidth(),
                 enabled = detail?.siteUrl != null,
             ) {
-                NeuText(text = stringResource(R.string.view_site))
+                Text(text = stringResource(R.string.view_site))
             }
-            NeuButton(
+            SecondaryButton(
                 onClick = {},
                 modifier = Modifier.fillMaxWidth(),
-                variant = NeuButtonVariant.Neutral,
             ) {
-                NeuText(text = stringResource(R.string.view_logs))
+                Text(text = stringResource(R.string.view_logs))
             }
             DeploymentDetailCard(detail = detail)
         }

@@ -13,9 +13,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.karasu256.vcnative.R
-import com.karasu256.vcnative.ui.components.NeuButton
-import com.karasu256.vcnative.ui.components.NeuText
 import com.karasu256.vcnative.ui.theme.NeuTheme
+import com.karasu256.vcnative.ui.theme.PrimaryButton
 import compose.icons.SimpleIcons
 import compose.icons.simpleicons.Github
 
@@ -36,13 +35,13 @@ fun GitHubUnlinkSheet(
                 )
             },
         )
-        NeuButton(
+        PrimaryButton(
             onClick = onUnlink,
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(NeuTheme.spacing.lg),
         ) {
-            NeuText(text = stringResource(R.string.unlink_github))
+            Text(text = stringResource(R.string.unlink_github))
         }
     }
 }

@@ -1,13 +1,12 @@
 package com.karasu256.vcnative.ui.home
 
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.size
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ContentPaste
+import androidx.compose.material3.Icon
+import androidx.compose.material3.Text
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -25,7 +24,6 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.platform.LocalClipboard
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
@@ -37,13 +35,11 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.karasu256.vcnative.R
-import com.karasu256.vcnative.ui.components.NeuButton
-import com.karasu256.vcnative.ui.components.NeuButtonVariant
-import com.karasu256.vcnative.ui.components.NeuText
-import com.karasu256.vcnative.ui.components.NeuTextField
 import com.karasu256.vcnative.ui.components.unfocus
-import com.karasu256.vcnative.ui.theme.LocalNeuContentColor
+import com.karasu256.vcnative.ui.theme.InputField
 import com.karasu256.vcnative.ui.theme.NeuTheme
+import com.karasu256.vcnative.ui.theme.PrimaryButton
+import com.karasu256.vcnative.ui.theme.ToolbarButton
 import com.ramcosta.composedestinations.annotation.Destination
 import com.ramcosta.composedestinations.annotation.RootGraph
 import com.ramcosta.composedestinations.generated.destinations.MainScreenDestination
@@ -86,20 +82,20 @@ fun MainScreen(
             modifier = Modifier.widthIn(max = 480.dp),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            NeuText(
+            Text(
                 text = stringResource(R.string.app_name),
                 style = NeuTheme.typography.headline,
                 textAlign = TextAlign.Center,
             )
             Spacer(Modifier.height(spacing.md))
-            NeuText(
+            Text(
                 text = stringResource(R.string.api_key_description),
                 style = NeuTheme.typography.bodyMedium,
                 color = NeuTheme.colors.onSurfaceMuted,
                 textAlign = TextAlign.Center,
             )
             Spacer(Modifier.height(spacing.xl))
-            NeuTextField(
+            InputField(
                 value = uiState.apiKey,
                 onValueChange = viewModel::onApiKeyChange,
                 modifier = Modifier.fillMaxWidth(),
@@ -112,7 +108,7 @@ fun MainScreen(
                 ),
                 visualTransformation = PasswordVisualTransformation(),
                 trailing = {
-                    NeuButton(
+                    ToolbarButton(
                         onClick = {
                             scope.launch {
                                 clipboard.getClipEntry()
@@ -126,21 +122,17 @@ fun MainScreen(
                                     ?.let(viewModel::onApiKeyChange)
                             }
                         },
-                        modifier = Modifier.size(48.dp),
-                        variant = NeuButtonVariant.Neutral,
-                        contentPadding = PaddingValues(0.dp),
                     ) {
-                        Image(
+                        Icon(
                             imageVector = Icons.Default.ContentPaste,
                             contentDescription = stringResource(R.string.paste),
-                            colorFilter = ColorFilter.tint(LocalNeuContentColor.current),
                         )
                     }
                 },
             )
             uiState.errorRes?.let { errorRes ->
                 Spacer(Modifier.height(spacing.md))
-                NeuText(
+                Text(
                     text = stringResource(errorRes),
                     style = NeuTheme.typography.bodyMedium,
                     color = NeuTheme.colors.danger,
@@ -148,13 +140,13 @@ fun MainScreen(
                 )
             }
             Spacer(Modifier.height(spacing.xl))
-            NeuButton(
+            PrimaryButton(
                 onClick = viewModel::login,
                 modifier = Modifier.fillMaxWidth(),
                 enabled = uiState.apiKey.isNotBlank(),
                 loading = uiState.isLoading,
             ) {
-                NeuText(text = stringResource(R.string.save_and_verify))
+                Text(text = stringResource(R.string.save_and_verify))
             }
         }
     }

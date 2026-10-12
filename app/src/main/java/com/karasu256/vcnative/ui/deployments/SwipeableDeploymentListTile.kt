@@ -1,16 +1,9 @@
 package com.karasu256.vcnative.ui.deployments
 
-import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Block
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.History
-import androidx.compose.material3.Icon
-import androidx.compose.material3.Text
 import androidx.compose.material3.SwipeToDismissBox
 import androidx.compose.material3.SwipeToDismissBoxValue
 import androidx.compose.material3.rememberSwipeToDismissBoxState
@@ -18,11 +11,10 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.stringResource
 import com.karasu256.vcnative.R
-import com.karasu256.vcnative.ui.theme.NeuTheme
+import com.karasu256.vcnative.ui.theme.SwipeActionBackground
 import kotlinx.coroutines.launch
 
 @Composable
@@ -69,24 +61,12 @@ private fun SwipeBackground(
     action: DeploymentAction,
     alignment: Alignment.Horizontal,
 ) {
-    val statusColors = NeuTheme.statusColors
-    val color = when (action) {
-        is DeploymentAction.Rollback -> statusColors.progress
-        is DeploymentAction.Cancel,
-        is DeploymentAction.Delete -> statusColors.error
-    }
-    val label = stringResource(action.labelRes)
-    Row(
-        modifier = Modifier
-            .fillMaxSize()
-            .background(color)
-            .padding(horizontal = NeuTheme.spacing.lg),
-        horizontalArrangement = Arrangement.spacedBy(NeuTheme.spacing.sm, alignment),
-        verticalAlignment = Alignment.CenterVertically,
-    ) {
-        Icon(imageVector = action.icon, contentDescription = null, tint = Color.White)
-        Text(text = label, color = Color.White)
-    }
+    SwipeActionBackground(
+        icon = action.icon,
+        label = stringResource(action.labelRes),
+        alignment = alignment,
+        destructive = action !is DeploymentAction.Rollback,
+    )
 }
 
 private val DeploymentAction.icon: ImageVector

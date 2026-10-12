@@ -17,6 +17,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.LocalContentColor
+import androidx.compose.material3.LocalTextStyle
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.getValue
@@ -110,6 +111,7 @@ fun NeuButton(
             LocalNeuContentColor provides contentColor,
             LocalContentColor provides contentColor,
             LocalNeuTextStyle provides NeuTheme.typography.button,
+            LocalTextStyle provides NeuTheme.typography.button,
         ) {
             AnimatedContent(
                 targetState = loading,

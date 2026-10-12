@@ -9,7 +9,6 @@ import androidx.compose.foundation.gestures.horizontalDrag
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.WindowInsets
@@ -31,7 +30,9 @@ import androidx.compose.material.icons.filled.AccountCircle
 import androidx.compose.material.icons.filled.Brightness6
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material3.DrawerState
+import androidx.compose.material3.Icon
 import androidx.compose.material3.ModalNavigationDrawer
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.remember
@@ -40,9 +41,7 @@ import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.graphics.ImageBitmap
-import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.input.pointer.positionChange
 import androidx.compose.ui.input.pointer.util.VelocityTracker
@@ -53,12 +52,10 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.lerp
 import com.karasu256.vcnative.R
-import com.karasu256.vcnative.ui.components.NeuButton
-import com.karasu256.vcnative.ui.components.NeuButtonVariant
-import com.karasu256.vcnative.ui.components.NeuSurface
-import com.karasu256.vcnative.ui.components.NeuText
-import com.karasu256.vcnative.ui.theme.LocalNeuContentColor
+import com.karasu256.vcnative.ui.theme.BarSurface
+import com.karasu256.vcnative.ui.theme.DrawerSurface
 import com.karasu256.vcnative.ui.theme.NeuTheme
+import com.karasu256.vcnative.ui.theme.ToolbarButton
 import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.launch
 
@@ -95,7 +92,7 @@ fun ShellDrawer(
         drawerContent = {
             BoxWithConstraints {
                 val fullWidthPx = constraints.maxWidth
-                NeuSurface(
+                DrawerSurface(
                     modifier = Modifier
                         .fillMaxHeight()
                         .width(lerp(DrawerWidth, maxWidth, expansion.value))
@@ -135,14 +132,9 @@ fun ShellDrawer(
                                 scope.launch { expansion.animateTo(target) }
                             }
                         },
-                    shape = RectangleShape,
                 ) {
                     Column {
-                        NeuSurface(
-                            modifier = Modifier.fillMaxWidth(),
-                            shape = NeuTheme.bar.shape,
-                            depth = NeuTheme.bar.depth,
-                        ) {
+                        BarSurface(modifier = Modifier.fillMaxWidth()) {
                             Row(
                                 modifier = Modifier
                                     .windowInsetsPadding(WindowInsets.statusBars)
@@ -155,19 +147,13 @@ fun ShellDrawer(
                                 horizontalArrangement = Arrangement.spacedBy(spacing.lg),
                                 verticalAlignment = Alignment.CenterVertically,
                             ) {
-                                NeuButton(
-                                    onClick = { scope.launch { drawerState.close() } },
-                                    modifier = Modifier.size(48.dp),
-                                    variant = NeuButtonVariant.Neutral,
-                                    contentPadding = PaddingValues(0.dp),
-                                ) {
-                                    Image(
+                                ToolbarButton(onClick = { scope.launch { drawerState.close() } }) {
+                                    Icon(
                                         imageVector = Icons.Default.Close,
                                         contentDescription = stringResource(R.string.close_menu),
-                                        colorFilter = ColorFilter.tint(LocalNeuContentColor.current),
                                     )
                                 }
-                                NeuText(
+                                Text(
                                     text = stringResource(R.string.menu),
                                     style = NeuTheme.typography.title,
                                     maxLines = 1,
@@ -175,11 +161,7 @@ fun ShellDrawer(
                             }
                         }
                         Spacer(Modifier.weight(1f))
-                        NeuSurface(
-                            modifier = Modifier.fillMaxWidth(),
-                            shape = NeuTheme.bar.shape,
-                            depth = NeuTheme.bar.depth,
-                        ) {
+                        BarSurface(modifier = Modifier.fillMaxWidth()) {
                             Row(
                                 modifier = Modifier
                                     .windowInsetsPadding(
@@ -190,24 +172,13 @@ fun ShellDrawer(
                                 horizontalArrangement = Arrangement.SpaceBetween,
                                 verticalAlignment = Alignment.CenterVertically,
                             ) {
-                                NeuButton(
-                                    onClick = onUserClick,
-                                    modifier = Modifier.size(48.dp),
-                                    variant = NeuButtonVariant.Neutral,
-                                    contentPadding = PaddingValues(0.dp),
-                                ) {
+                                ToolbarButton(onClick = onUserClick) {
                                     UserAvatar(avatar = avatar, size = 36.dp)
                                 }
-                                NeuButton(
-                                    onClick = onThemeClick,
-                                    modifier = Modifier.size(48.dp),
-                                    variant = NeuButtonVariant.Neutral,
-                                    contentPadding = PaddingValues(0.dp),
-                                ) {
-                                    Image(
+                                ToolbarButton(onClick = onThemeClick) {
+                                    Icon(
                                         imageVector = Icons.Default.Brightness6,
                                         contentDescription = stringResource(R.string.theme),
-                                        colorFilter = ColorFilter.tint(LocalNeuContentColor.current),
                                     )
                                 }
                             }
@@ -236,11 +207,10 @@ fun UserAvatar(
             contentScale = ContentScale.Crop,
         )
     } else {
-        Image(
+        Icon(
             imageVector = Icons.Default.AccountCircle,
             contentDescription = stringResource(R.string.user),
             modifier = modifier.size(size),
-            colorFilter = ColorFilter.tint(LocalNeuContentColor.current),
         )
     }
 }

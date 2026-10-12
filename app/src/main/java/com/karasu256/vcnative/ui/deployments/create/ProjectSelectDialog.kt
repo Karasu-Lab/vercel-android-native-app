@@ -23,7 +23,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import com.karasu256.vcnative.R
-import com.karasu256.vcnative.ui.components.NeuSkeleton
+import com.karasu256.vcnative.ui.theme.Skeleton
 import com.karasu256.vcnative.ui.theme.NeuTheme
 import compose.icons.SimpleIcons
 import compose.icons.simpleicons.Vercel
@@ -42,7 +42,7 @@ fun ProjectSelectDialog(
             if (projects == null) {
                 Column {
                     repeat(4) {
-                        NeuSkeleton(
+                        Skeleton(
                             modifier = Modifier
                                 .fillMaxWidth()
                                 .padding(vertical = NeuTheme.spacing.sm)
@@ -81,7 +81,7 @@ fun ProjectIcon(
                 .clip(CircleShape),
             contentScale = ContentScale.Crop,
         )
-        project.project.avatarHash != null -> NeuSkeleton(modifier = modifier.size(size), shape = CircleShape)
+        project.project.avatarHash != null -> Skeleton(modifier = modifier.size(size), shape = CircleShape)
         else -> Icon(
             imageVector = SimpleIcons.Vercel,
             contentDescription = null,
