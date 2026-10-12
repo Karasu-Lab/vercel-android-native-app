@@ -78,6 +78,7 @@ dependencies {
     implementation(libs.material)
     implementation libs.androidx.viewpager2
     implementation libs.androidx.biometric
+    implementation libs.markdown.renderer.m3
 
     implementation(libs.constraintlayout)
 

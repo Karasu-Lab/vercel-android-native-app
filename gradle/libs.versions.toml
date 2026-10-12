@@ -42,6 +42,7 @@ ksp = "2.3.12"
 squareup-logging-interceptor = "5.4.0"
 viewpager2 = "1.1.0"
 biometric = "1.1.0"
+markdown-renderer = "0.45.0"
 
 [libraries]
 
@@ -50,6 +51,7 @@ androidx-hilt-lifecycle-viewmodel-compose = { module = "androidx.hilt:hilt-lifec
 androidx-navigation-compose = { module = "androidx.navigation:navigation-compose", version.ref = "navigation-compose" }
 androidx-viewpager2 = { module = "androidx.viewpager2:viewpager2", version.ref = "viewpager2" }
 androidx-biometric = { module = "androidx.biometric:biometric", version.ref = "biometric" }
+markdown-renderer-m3 = { module = "com.mikepenz:multiplatform-markdown-renderer-m3", version.ref = "markdown-renderer" }
 kotlin-stdlib = { module = "org.jetbrains.kotlin:kotlin-stdlib", version.ref = "kotlin-stdlib" }
 kotlinx-serialization-json = { module = "org.jetbrains.kotlinx:kotlinx-serialization-json", version.ref = "kotlinx-serialization-json" }
 annotation = { module = "androidx.annotation:annotation", version.ref = "annotation" }
