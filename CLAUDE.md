@@ -11,3 +11,5 @@
 - Do not ask the user for screenshots.
 - Do not reply with questions. Make a decision and act on it.
 - Do not mention whether the project was built, e.g. "not built yet".
+- Do not build the project (e.g. `./gradlew`) unless the user explicitly instructs it.
+- Do not filter build or command output with guessed error patterns (e.g. `grep -E "^e:|error:|FAILED"`). Read the output as-is.
